@@ -5,8 +5,9 @@ use actix_web::{
 };
 
 mod container;
-mod services;
+mod infrastructure;
 mod schema;
+mod services;
 
 #[get("/")]
 async fn mock_action() -> impl Responder {
@@ -17,8 +18,8 @@ async fn mock_action() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
+            .app_data(container::AppContainer::new())
             .service(mock_action)
-            .service(resource("/mocks").get(services::mocks_service::MockService::create_mock))
     })
     .bind(("127.0.0.1", 8080))?
     .run()

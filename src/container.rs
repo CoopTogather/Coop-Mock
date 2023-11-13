@@ -1,13 +1,28 @@
-use crate::services::mocks_service::MockService;
+use std::sync::Arc;
+
+use crate::{
+    infrastructure::{
+        databases::{get_connection_string, postgre::create_db_pool},
+        repositories::mock_repository::MockRepositoryImpl,
+    },
+    services::mocks_service::{MockService, MockServiceImpl},
+};
 
 pub struct AppContainer {
-    pub mocks_service: MockService,
+    pub mocks_service: Arc<dyn MockService>,
 }
 
 impl AppContainer {
     pub fn new() -> Self {
+        let postgre_connection_pool =
+            create_db_pool(get_connection_string("DATABASE_URL".to_string()));
+
+        let mock_repository = Arc::new(MockRepositoryImpl::new(Arc::new(
+            postgre_connection_pool.clone(),
+        )));
+
         Self {
-            mocks_service: MockService,
+            mocks_service: Arc::new(MockServiceImpl::new(mock_repository.clone())),
         }
     }
 }

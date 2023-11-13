@@ -1,11 +1,26 @@
-use actix_web::{HttpResponse, Responder};
+use actix_web::Error;
+use std::sync::Arc;
 
-pub struct MockService;
+use crate::infrastructure::repositories::mock_repository::MockRepository;
 
-impl MockService {
-    pub async fn create_mock() -> impl Responder {
-        println!("Mock created!");
+pub struct MockServiceImpl {
+    pub mock_repository: Arc<dyn MockRepository>,
+}
 
-        HttpResponse::Ok().body("Mock created!")
+#[async_trait::async_trait]
+pub trait MockService: Sync + Send {
+    async fn create_mock(&self) -> Result<(), Error>;
+}
+
+impl MockServiceImpl {
+    pub fn new(mock_repository: Arc<dyn MockRepository>) -> Self {
+        Self { mock_repository }
+    }
+}
+
+#[async_trait::async_trait]
+impl MockService for MockServiceImpl {
+    async fn create_mock(&self) -> Result<(), Error> {
+        Ok(())
     }
 }
