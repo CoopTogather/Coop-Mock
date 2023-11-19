@@ -5,6 +5,7 @@ use actix_web::{
 };
 
 mod container;
+mod domain;
 mod infrastructure;
 mod schema;
 mod services;

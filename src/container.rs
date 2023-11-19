@@ -3,9 +3,9 @@ use std::sync::Arc;
 use crate::{
     infrastructure::{
         databases::{get_connection_string, postgre::create_db_pool},
-        repositories::mock_repository::MockRepositoryImpl,
+        repositories::settings_repository::SettingsRepositoryImpl,
     },
-    services::mocks_service::{MockService, MockServiceImpl},
+    services::settings_service::{MockService, MockServiceImpl},
 };
 
 pub struct AppContainer {
@@ -17,7 +17,7 @@ impl AppContainer {
         let postgre_connection_pool =
             create_db_pool(get_connection_string("DATABASE_URL".to_string()));
 
-        let mock_repository = Arc::new(MockRepositoryImpl::new(Arc::new(
+        let mock_repository = Arc::new(SettingsRepositoryImpl::new(Arc::new(
             postgre_connection_pool.clone(),
         )));
 

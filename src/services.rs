@@ -1,1 +1,1 @@
-pub mod mocks_service;
+pub mod settings_service;
