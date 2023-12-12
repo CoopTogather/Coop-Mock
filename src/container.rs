@@ -21,11 +21,11 @@ impl AppContainer {
             create_db_pool(get_connection_string("DATABASE_URL".to_string()));
         let shared_connection_pool = Arc::new(postgre_connection_pool);
 
-        let mock_repository = Arc::new(SettingsRepositoryImpl::new(&shared_connection_pool));
+        let mock_repository = Arc::new(SettingsRepositoryImpl::new(shared_connection_pool.clone()));
 
         Self {
             shared_connection_pool: shared_connection_pool,
-            mock_repository,
+            mock_repository: mock_repository,
         }
     }
 }

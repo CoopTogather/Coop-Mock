@@ -7,8 +7,8 @@ use diesel::{
 
 use crate::domain::models::settings::CreateSettings;
 
-pub struct SettingsRepositoryImpl<'a> {
-    pub pool: &'a Arc<Pool<ConnectionManager<diesel::PgConnection>>>,
+pub struct SettingsRepositoryImpl {
+    pub pool: Arc<Pool<ConnectionManager<diesel::PgConnection>>>,
 }
 
 #[async_trait::async_trait]
@@ -16,8 +16,8 @@ pub trait SettingsRepository: Send + Sync {
     async fn create_mock(&self, create_settings: CreateSettings) -> Result<usize, &str>;
 }
 
-impl SettingsRepositoryImpl {
-    pub fn new(connection_pool: &Arc<Pool<ConnectionManager<diesel::PgConnection>>>) -> Self {
+impl<'registry> SettingsRepositoryImpl {
+    pub fn new(connection_pool: Arc<Pool<ConnectionManager<diesel::PgConnection>>>) -> Self {
         Self {
             pool: connection_pool,
         }
