@@ -1,31 +1,23 @@
 use std::sync::Arc;
 
-use diesel::{
-    r2d2::{ConnectionManager, Pool},
-    PgConnection,
-};
-
-use crate::infrastructure::{
-    databases::{get_connection_string, postgre::create_db_pool},
-    repositories::settings_repository::{SettingsRepository, SettingsRepositoryImpl},
+use crate::{
+    infrastructure::container_injection::InfraContainer,
+    services::container_injection::ServiceContainer,
 };
 
 pub struct AppContainer {
-    pub shared_connection_pool: Arc<Pool<ConnectionManager<PgConnection>>>,
-    pub mock_repository: Arc<dyn SettingsRepository>,
+    pub infra_container: Arc<InfraContainer>,
+    pub services_container: Arc<ServiceContainer>,
 }
 
 impl AppContainer {
     pub fn new() -> Self {
-        let postgre_connection_pool =
-            create_db_pool(get_connection_string("DATABASE_URL".to_string()));
-        let shared_connection_pool = Arc::new(postgre_connection_pool);
-
-        let mock_repository = Arc::new(SettingsRepositoryImpl::new(shared_connection_pool.clone()));
+        let infra_container = Arc::new(InfraContainer::new());
+        let services_container = Arc::new(ServiceContainer::new(&infra_container));
 
         Self {
-            shared_connection_pool: shared_connection_pool,
-            mock_repository: mock_repository,
+            infra_container,
+            services_container,
         }
     }
 }

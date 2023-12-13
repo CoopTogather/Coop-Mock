@@ -1,0 +1,1 @@
+ALTER TABLE endpoints_setting ALTER COLUMN options DROP NOT NULL;

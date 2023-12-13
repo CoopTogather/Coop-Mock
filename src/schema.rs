@@ -6,7 +6,7 @@ diesel::table! {
         #[max_length = 255]
         name -> Varchar,
         path -> Text,
-        options -> Jsonb,
+        options -> Nullable<Jsonb>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }

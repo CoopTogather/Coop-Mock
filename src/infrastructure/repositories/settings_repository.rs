@@ -16,7 +16,7 @@ pub trait SettingsRepository: Send + Sync {
     async fn create_mock(&self, create_settings: CreateSettings) -> Result<usize, &str>;
 }
 
-impl<'registry> SettingsRepositoryImpl {
+impl SettingsRepositoryImpl {
     pub fn new(connection_pool: Arc<Pool<ConnectionManager<diesel::PgConnection>>>) -> Self {
         Self {
             pool: connection_pool,

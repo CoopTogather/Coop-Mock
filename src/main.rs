@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use poem::{middleware::AddData, EndpointExt, Route};
+use container::AppContainer;
+use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
 
 mod api;
 mod container;
@@ -10,9 +11,12 @@ mod schema;
 mod services;
 
 #[tokio::main]
-async fn main() {
-    let app = Route::new();
-    let app_container = AddData::new(Arc::new(container::AppContainer::new()));
+async fn main() -> Result<(), std::io::Error> {
+    let app = Route::new().nest("/settings", api::settings::settings_routes());
 
-    app.with(app_container);
+    let app = app.with(AddData::new(Arc::new(AppContainer::new())));
+
+    Server::new(TcpListener::bind("0.0.0.0:3033"))
+        .run(app)
+        .await
 }

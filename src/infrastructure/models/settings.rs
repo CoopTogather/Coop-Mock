@@ -9,7 +9,7 @@ pub struct EndpointSettings {
     pub id: i32,
     pub name: String,
     pub path: String,
-    pub options: serde_json::Value,
+    pub options: Option<serde_json::Value>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
@@ -20,7 +20,7 @@ pub struct EndpointSettings {
 pub struct CreateEndpointSettingsDiesel {
     pub name: String,
     pub path: String,
-    pub options: serde_json::Value,
+    pub options: Option<serde_json::Value>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
