@@ -5,7 +5,7 @@ use diesel::{
     RunQueryDsl,
 };
 
-use crate::domain::models::settings::CreateSettings;
+use crate::domain::models::settings::CreateSettingsDto;
 
 pub struct SettingsRepositoryImpl {
     pub pool: Arc<Pool<ConnectionManager<diesel::PgConnection>>>,
@@ -13,7 +13,7 @@ pub struct SettingsRepositoryImpl {
 
 #[async_trait::async_trait]
 pub trait SettingsRepository: Send + Sync {
-    async fn create_mock(&self, create_settings: CreateSettings) -> Result<usize, &str>;
+    async fn create_mock(&self, create_settings: CreateSettingsDto) -> Result<usize, &str>;
 }
 
 impl SettingsRepositoryImpl {
@@ -26,7 +26,7 @@ impl SettingsRepositoryImpl {
 
 #[async_trait::async_trait]
 impl SettingsRepository for SettingsRepositoryImpl {
-    async fn create_mock(&self, create_settings: CreateSettings) -> Result<usize, &str> {
+    async fn create_mock(&self, create_settings: CreateSettingsDto) -> Result<usize, &str> {
         use crate::{
             infrastructure::models::settings::CreateEndpointSettingsDiesel,
             schema::endpoints_setting,

@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-use crate::domain::models::settings::CreateSettings;
+use crate::domain::models::settings::CreateSettingsDto;
 
 #[derive(Queryable, Selectable)]
 #[diesel(table_name = crate::schema::endpoints_setting)]
@@ -26,7 +26,7 @@ pub struct CreateEndpointSettingsDiesel {
 }
 
 impl CreateEndpointSettingsDiesel {
-    pub fn from(create_settings: CreateSettings) -> Self {
+    pub fn from(create_settings: CreateSettingsDto) -> Self {
         Self {
             name: create_settings.name,
             path: create_settings.path,

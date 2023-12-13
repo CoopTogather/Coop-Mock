@@ -9,5 +9,8 @@ diesel::table! {
         options -> Nullable<Jsonb>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
+        #[max_length = 255]
+        method -> Varchar,
+        enabled -> Bool,
     }
 }

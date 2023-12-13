@@ -12,7 +12,7 @@ mod services;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
-    let app = Route::new().nest("/settings", api::settings::settings_routes());
+    let app = Route::new().nest("/settings", api::endpoints::settings::settings_routes());
 
     let app = app.with(AddData::new(Arc::new(AppContainer::new())));
 
