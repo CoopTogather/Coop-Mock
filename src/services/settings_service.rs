@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    domain::models::settings::CreateSettingsDto,
+    domain::models::{settings::CreateSettingsDto, CommandModel},
     infrastructure::repositories::settings_repository::SettingsRepository,
 };
 
@@ -25,7 +25,10 @@ impl SettingsServiceImpl {
 #[async_trait::async_trait]
 impl SettingsService for SettingsServiceImpl {
     async fn create_mock(&self, settings: CreateSettingsDto) -> Result<usize, &str> {
-        let result = self.settings_repository.create_mock(settings).await;
+        let result = self
+            .settings_repository
+            .create_mock(settings.to_diesel_model())
+            .await;
 
         result
     }

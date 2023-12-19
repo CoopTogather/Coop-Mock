@@ -29,6 +29,8 @@ pub async fn create_mock(
             name: create_dto.name,
             path: create_dto.path,
             options: create_dto.options,
+            enabled: create_dto.enabled,
+            method: create_dto.method,
         })
         .await;
 

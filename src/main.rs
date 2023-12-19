@@ -7,7 +7,6 @@ mod api;
 mod container;
 mod domain;
 mod infrastructure;
-mod schema;
 mod services;
 
 #[tokio::main]
