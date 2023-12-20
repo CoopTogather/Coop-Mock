@@ -1,13 +1,8 @@
+use coop_service::container::AppContainer;
+use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
 use std::sync::Arc;
 
-use container::AppContainer;
-use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
-
 mod api;
-mod container;
-mod domain;
-mod infrastructure;
-mod services;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {

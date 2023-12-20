@@ -152,8 +152,7 @@ name = "coop-mock"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chrono",
- "diesel",
+ "coop_service",
  "dotenvy",
  "poem",
  "serde",

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use coop_service::{container::AppContainer, domain::models::settings::CreateSettingsDto};
 use poem::{
     handler,
     http::StatusCode,
@@ -8,10 +9,7 @@ use poem::{
     IntoResponse, Route,
 };
 
-use crate::{
-    api::models::settings_models::CreateSettingsRequestDto, container::AppContainer,
-    domain::models::settings::CreateSettingsDto,
-};
+use crate::api::models::settings_models::CreateSettingsRequestDto;
 
 pub fn settings_routes() -> Route {
     Route::new().at("/endpoint", post(create_mock))
