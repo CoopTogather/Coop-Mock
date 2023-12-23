@@ -154,6 +154,7 @@ dependencies = [
  "async-trait",
  "coop_service",
  "dotenvy",
+ "endpoint_handler",
  "poem",
  "serde",
  "serde_json",
@@ -249,6 +250,13 @@ name = "dotenvy"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
+
+[[package]]
+name = "endpoint_handler"
+version = "0.1.0"
+dependencies = [
+ "poem",
+]
 
 [[package]]
 name = "equivalent"
