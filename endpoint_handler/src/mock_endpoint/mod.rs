@@ -1,6 +1,9 @@
+pub mod options;
+
 pub struct MockEndpoint {
     pub paths: Vec<String>,
-    pub method: 
+    pub method: HttpMethod,
+    pub options: options::MockOptions,
 }
 
 pub enum HttpMethod {
@@ -8,5 +11,5 @@ pub enum HttpMethod {
     POST,
     PUT,
     DELETE,
-    PATCH
+    PATCH,
 }
