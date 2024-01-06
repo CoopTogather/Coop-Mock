@@ -1,3 +1,0 @@
--- Your SQL goes here
-ALTER TABLE endpoints_setting ADD COLUMN method VARCHAR(255) NOT NULL DEFAULT 'GET';
-ALTER TABLE endpoints_setting ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT TRUE;

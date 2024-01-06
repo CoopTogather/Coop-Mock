@@ -1,1 +1,0 @@
-ALTER endpoints_setting ALTER COLUMN options SET NOT NULL;

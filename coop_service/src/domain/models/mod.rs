@@ -1,5 +1,5 @@
-pub mod settings;
+pub mod endpoints;
 
 pub trait CommandModel<TDiesel> {
-    fn to_diesel_model(self) -> TDiesel;
+    fn to_active_model(self) -> TDiesel;
 }

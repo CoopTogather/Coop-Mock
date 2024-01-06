@@ -11,19 +11,13 @@ pub struct AppContainer {
 }
 
 impl AppContainer {
-    pub fn new() -> Self {
-        let infra_container = Arc::new(InfraContainer::new());
+    pub async fn new() -> Self {
+        let infra_container = Arc::new(InfraContainer::new().await);
         let services_container = Arc::new(ServiceContainer::new(&infra_container));
 
         Self {
             infra_container,
             services_container,
         }
-    }
-}
-
-impl Default for AppContainer {
-    fn default() -> Self {
-        Self::new()
     }
 }

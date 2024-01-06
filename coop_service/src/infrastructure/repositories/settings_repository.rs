@@ -1,26 +1,22 @@
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
-use diesel::{
-    r2d2::{ConnectionManager, Pool},
-    RunQueryDsl,
-};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait};
 
-use crate::infrastructure::models::settings::CreateEndpointSettingsDiesel;
+use crate::infrastructure::models::end_points;
 
 pub struct SettingsRepositoryImpl {
-    pub pool: Arc<Pool<ConnectionManager<diesel::PgConnection>>>,
+    pub pool: Arc<DatabaseConnection>,
 }
 
 #[async_trait::async_trait]
 pub trait SettingsRepository: Send + Sync {
-    async fn create_mock(
-        &self,
-        create_settings: CreateEndpointSettingsDiesel,
-    ) -> Result<usize, &str>;
+    async fn create_mock(&self, add_endpoint: end_points::ActiveModel) -> Result<(), &str>;
+
+    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<end_points::Model>, &str>;
 }
 
 impl SettingsRepositoryImpl {
-    pub fn new(connection_pool: Arc<Pool<ConnectionManager<diesel::PgConnection>>>) -> Self {
+    pub fn new(connection_pool: Arc<DatabaseConnection>) -> Self {
         Self {
             pool: connection_pool,
         }
@@ -29,18 +25,34 @@ impl SettingsRepositoryImpl {
 
 #[async_trait::async_trait]
 impl SettingsRepository for SettingsRepositoryImpl {
-    async fn create_mock(
-        &self,
-        create_settings: CreateEndpointSettingsDiesel,
-    ) -> Result<usize, &str> {
-        use crate::infrastructure::schema::endpoints_setting;
+    async fn create_mock(&self, add_endpoint: end_points::ActiveModel) -> Result<(), &str> {
+        let connection_pool = self.pool.deref();
 
-        let mut connection = self.pool.get().unwrap();
-        let result = diesel::insert_into(endpoints_setting::dsl::endpoints_setting)
-            .values(create_settings)
-            .execute(&mut connection)
-            .map_err(|_| "Error creating mock");
+        match add_endpoint.insert(connection_pool).await {
+            Ok(endpoint) => {
+                println!("Endpoint created: {:?}", endpoint);
+            }
+            Err(err) => {
+                println!("Error creating endpoint: {:?}", err);
+            }
+        };
 
-        result
+        Ok(())
+    }
+
+    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<end_points::Model>, &str> {
+        let connection_pool = self.pool.deref();
+
+        let endpoint = end_points::Entity::find_by_id(endpoint_id)
+            .one(connection_pool)
+            .await;
+
+        match endpoint {
+            Ok(endpoint) => Ok(endpoint),
+            Err(err) => {
+                println!("Error getting endpoint: {:?}", err);
+                Err("Error getting endpoint")
+            }
+        }
     }
 }
