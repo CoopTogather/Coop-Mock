@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use coop_service::{container::AppContainer, domain::models::endpoints::CreateEndpointDto};
 use poem::{
     get, handler,
@@ -8,8 +6,8 @@ use poem::{
     web::{Data, Json},
     Body, IntoResponse, Response, Route,
 };
-use serde::Serialize;
-use serde_json::value::Serializer;
+
+use std::sync::Arc;
 
 use crate::api::models::settings_models::CreateSettingsRequestDto;
 

@@ -1,0 +1,16 @@
+[package]
+name = "web-api"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+coop-service.workspace = true
+endpoint-handler.workspace = true
+
+poem = { version = "2.0.0" }
+tokio = { version = "1.35.0", features = ["full"] }
+dotenvy = "0.15.7"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+async-trait = "0.1.74"

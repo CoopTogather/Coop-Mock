@@ -603,22 +603,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
-name = "coop-mock"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "coop_service",
- "dotenvy",
- "endpoint_handler",
- "migration",
- "poem",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "coop_service"
+name = "coop-service"
 version = "0.1.0"
 dependencies = [
  "async-trait",
@@ -749,7 +734,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "endpoint_handler"
+name = "endpoint-handler"
 version = "0.1.0"
 dependencies = [
  "poem",
@@ -3167,6 +3152,20 @@ name = "wasm-bindgen-shared"
 version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d046c5d029ba91a1ed14da14dca44b68bf2f124cfbaf741c54151fdb3e0750b"
+
+[[package]]
+name = "web-api"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "coop-service",
+ "dotenvy",
+ "endpoint-handler",
+ "poem",
+ "serde",
+ "serde_json",
+ "tokio",
+]
 
 [[package]]
 name = "web-sys"

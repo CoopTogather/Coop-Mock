@@ -1,4 +1,4 @@
-use endpoint_handler::endpoint_template::{Template, TemplateImpl};
+use endpoint_handler::endpoint_template::TemplateImpl;
 
 #[test]
 pub fn endpoint_path_string_convert_to_template() {

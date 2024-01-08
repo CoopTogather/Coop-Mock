@@ -1,9 +1,10 @@
-use coop_service::container::AppContainer;
-use endpoint_handler::handle_mock_request;
-use poem::{get, listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
 use std::sync::Arc;
 
-mod api;
+use coop_service::container::AppContainer;
+use endpoint_handler::handle_mock_request;
+use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
+
+pub mod api;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
