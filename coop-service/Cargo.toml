@@ -1,5 +1,5 @@
 [package]
-name = "coop_service"
+name = "coop-service"
 version = "0.1.0"
 edition = "2021"
 

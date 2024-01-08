@@ -16,6 +16,7 @@ pub struct SettingsServiceImpl {
 pub trait SettingsService: Sync + Send {
     async fn create_mock(&self, settings: CreateEndpointDto) -> Result<(), &str>;
     async fn get_mock(&self, id: i32) -> Result<Option<EndpointDto>, &str>;
+    async fn get_mocks(&self) -> Result<Vec<Option<EndpointDto>>, &str>;
 }
 
 impl SettingsServiceImpl {
@@ -42,6 +43,18 @@ impl SettingsService for SettingsServiceImpl {
 
         match result {
             Ok(endpoint) => Ok(EndpointDto::from(endpoint)),
+            Err(err) => Err(err),
+        }
+    }
+
+    async fn get_mocks(&self) -> Result<Vec<Option<EndpointDto>>, &str> {
+        let result = self.settings_repository.get_mocks().await;
+
+        match result {
+            Ok(endpoints) => Ok(endpoints
+                .into_iter()
+                .map(|e| EndpointDto::from(Some(e)))
+                .collect()),
             Err(err) => Err(err),
         }
     }

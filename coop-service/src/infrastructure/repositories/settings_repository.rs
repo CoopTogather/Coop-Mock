@@ -13,6 +13,8 @@ pub trait SettingsRepository: Send + Sync {
     async fn create_mock(&self, add_endpoint: end_points::ActiveModel) -> Result<(), &str>;
 
     async fn get_mock(&self, endpoint_id: i32) -> Result<Option<end_points::Model>, &str>;
+
+    async fn get_mocks(&self) -> Result<Vec<end_points::Model>, &str>;
 }
 
 impl SettingsRepositoryImpl {
@@ -52,6 +54,20 @@ impl SettingsRepository for SettingsRepositoryImpl {
             Err(err) => {
                 println!("Error getting endpoint: {:?}", err);
                 Err("Error getting endpoint")
+            }
+        }
+    }
+
+    async fn get_mocks(&self) -> Result<Vec<end_points::Model>, &str> {
+        let connection_pool = self.pool.deref();
+
+        let endpoints = end_points::Entity::find().all(connection_pool).await;
+
+        match endpoints {
+            Ok(endpoints) => Ok(endpoints),
+            Err(err) => {
+                println!("Error getting endpoints: {:?}", err);
+                Err("Error getting endpoints")
             }
         }
     }

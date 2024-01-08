@@ -1,6 +1,7 @@
 use super::CommandModel;
 use crate::infrastructure::models::end_points;
 use sea_orm::ActiveValue;
+use serde::Serialize;
 
 #[derive(Clone)]
 pub struct CreateEndpointDto {
@@ -12,7 +13,7 @@ pub struct CreateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct EndpointDto {
     pub name: String,
     pub path: String,
