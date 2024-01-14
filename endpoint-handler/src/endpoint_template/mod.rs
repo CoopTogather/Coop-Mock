@@ -1,3 +1,5 @@
+use coop_service::domain::models::endpoints::EndpointDto;
+
 use self::path::{TemplatePath, TemplatePathImpl};
 
 pub mod options;
@@ -26,14 +28,32 @@ pub enum HttpMethod {
 /// Template is a struct that represents a mock endpoint template.
 /// It is used to match incoming requests to a mock endpoint.
 /// # Example
-/// `/mock/{id:i32}` will split into a vector of TemplatePath structs.
-/// Each TemplatePath struct will contain a path and a path_type.
+/// ```
+/// use endpoint_handler::endpoint_template::TemplateImpl;
+///
+/// let path = String::from("/mock/{id:number}");
+///
+/// let template_path = TemplateImpl::new(path, String::from("POST"), None);
+///
+/// assert_eq!(template_path.paths.len(), 2);
+/// ```
 impl TemplateImpl {
     pub fn new(path: String, method: String, options: Option<serde_json::Value>) -> Self {
         Self {
             paths: match_path(path.as_str()),
             method: match_method(method.as_str()),
             options: match options {
+                Some(opt) => serde_json::from_value(opt).expect("Failed to parse mock options"),
+                None => options::MockOptions::default(),
+            },
+        }
+    }
+
+    pub fn from(endpoint_setting: EndpointDto) -> Self {
+        Self {
+            paths: match_path(endpoint_setting.path.as_str()),
+            method: match_method(endpoint_setting.method.as_str()),
+            options: match endpoint_setting.options {
                 Some(opt) => serde_json::from_value(opt).expect("Failed to parse mock options"),
                 None => options::MockOptions::default(),
             },

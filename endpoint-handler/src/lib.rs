@@ -1,8 +1,9 @@
 use poem::{handler, http::StatusCode, IntoResponse, Request};
 
+pub mod caching;
 pub mod endpoint_template;
 
-const MOCK_PATH: &str = "/mock/{id:u32}";
+const MOCK_PATH: &str = "/mock/{id:number}";
 
 #[handler]
 pub async fn handle_mock_request(req: &Request) -> impl IntoResponse {

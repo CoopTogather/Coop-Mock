@@ -1,9 +1,9 @@
 use super::CommandModel;
 use crate::infrastructure::models::end_points;
 use sea_orm::ActiveValue;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct CreateEndpointDto {
     pub name: String,
     pub path: String,

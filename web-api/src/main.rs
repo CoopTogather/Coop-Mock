@@ -9,8 +9,8 @@ pub mod api;
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
     let app = Route::new()
-        .at("/api/*", handle_mock_request)
-        .nest("/settings", api::endpoints::settings::settings_routes());
+        .nest("/settings", api::endpoints::settings::settings_routes())
+        .at("/*", handle_mock_request);
 
     let container = Arc::new(AppContainer::new().await);
 
