@@ -1,6 +1,7 @@
 use self::path::{TemplatePath, TemplatePathImpl};
 
 pub mod options;
+pub mod parameter;
 pub mod path;
 
 pub struct TemplateImpl {
