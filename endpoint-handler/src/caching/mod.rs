@@ -10,7 +10,7 @@ pub struct TemplatesCachingImpl {
 }
 
 pub trait TemplateCaching: Sync + Send {
-    fn get(&self, path: &str) -> Option<&Vec<TemplateImpl>>;
+    fn get(&self, path: &str) -> Option<Vec<TemplateImpl>>;
     fn add_range(&self, first_scope: &str, templates: Vec<TemplateImpl>);
 }
 
@@ -23,11 +23,11 @@ impl Default for TemplatesCachingImpl {
 }
 
 impl TemplateCaching for TemplatesCachingImpl {
-    fn get(&self, first_scope: &str) -> Option<&Vec<TemplateImpl>> {
+    fn get(&self, first_scope: &str) -> Option<Vec<TemplateImpl>> {
         let template_hash = self.templates.read().unwrap();
 
         match template_hash.get(first_scope).cloned() {
-            Some(templates) => Some(templates.clone()),
+            Some(templates) => Some(templates),
             None => None,
         }
     }
