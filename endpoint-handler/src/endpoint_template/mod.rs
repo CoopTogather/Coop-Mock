@@ -6,6 +6,7 @@ pub mod options;
 pub mod parameter;
 pub mod path;
 
+#[derive(Clone)]
 pub struct TemplateImpl {
     pub paths: Vec<TemplatePathImpl>,
     pub method: HttpMethod,
@@ -16,7 +17,7 @@ pub trait Template {
     fn matches(&self, path: &str, method: &str) -> bool;
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum HttpMethod {
     GET,
     POST,

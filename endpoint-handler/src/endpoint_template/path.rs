@@ -1,5 +1,6 @@
 use super::parameter::{TemplateScopeParameter, TemplateScopeParameterImpl};
 
+#[derive(Clone)]
 pub struct TemplatePathImpl {
     pub scope: String,
     pub parameter: Option<TemplateScopeParameterImpl>,
