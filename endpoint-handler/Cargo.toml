@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 coop-service.workspace = true
-
-poem = { version = "2.0.0" }
-serde = { version = "1.0.193", features = ["derive"] }
-serde_json = "1.0.108"
+poem.workspace = true
+serde.workspace = true
+serde_json.workspace = true
