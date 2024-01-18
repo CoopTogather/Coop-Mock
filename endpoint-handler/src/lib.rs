@@ -2,6 +2,7 @@ use poem::{handler, http::StatusCode, IntoResponse, Request};
 
 pub mod caching;
 pub mod endpoint_template;
+pub mod loader;
 
 const MOCK_PATH: &str = "/mock/{id:number}";
 

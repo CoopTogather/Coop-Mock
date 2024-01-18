@@ -737,6 +737,7 @@ dependencies = [
 name = "endpoint-handler"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "coop-service",
  "poem",
  "serde",

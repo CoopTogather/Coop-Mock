@@ -1,26 +1,20 @@
 use std::sync::Arc;
 
-use crate::{
-    domain::models::{
+use crate::domain::{
+    models::{
         endpoints::{CreateEndpointDto, EndpointDto},
         CommandModel,
     },
-    infrastructure::repositories::settings_repository::SettingsRepository,
+    repositories::endpoint::EndpointRepository,
+    services::endpoint::EndpointService,
 };
 
-pub struct SettingsServiceImpl {
-    pub settings_repository: Arc<dyn SettingsRepository>,
+pub struct EndpointServiceImpl {
+    pub settings_repository: Arc<dyn EndpointRepository>,
 }
 
-#[async_trait::async_trait]
-pub trait SettingsService: Sync + Send {
-    async fn create_mock(&self, settings: CreateEndpointDto) -> Result<(), &str>;
-    async fn get_mock(&self, id: i32) -> Result<Option<EndpointDto>, &str>;
-    async fn get_mocks(&self) -> Result<Vec<Option<EndpointDto>>, &str>;
-}
-
-impl SettingsServiceImpl {
-    pub fn new(settings_repository: Arc<dyn SettingsRepository>) -> Self {
+impl EndpointServiceImpl {
+    pub fn new(settings_repository: Arc<dyn EndpointRepository>) -> Self {
         Self {
             settings_repository,
         }
@@ -28,7 +22,7 @@ impl SettingsServiceImpl {
 }
 
 #[async_trait::async_trait]
-impl SettingsService for SettingsServiceImpl {
+impl EndpointService for EndpointServiceImpl {
     async fn create_mock(&self, settings: CreateEndpointDto) -> Result<(), &str> {
         let result = self
             .settings_repository

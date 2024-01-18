@@ -1,16 +1,19 @@
 use std::sync::Arc;
 
-use crate::infrastructure::container_injection::InfraContainer;
+use crate::{
+    domain::services::endpoint::EndpointService,
+    infrastructure::container_injection::InfraContainer,
+};
 
-use super::settings_service::{SettingsService, SettingsServiceImpl};
+use super::settings_service::EndpointServiceImpl;
 
 pub struct ServiceContainer {
-    pub settings_service: Arc<dyn SettingsService>,
+    pub settings_service: Arc<dyn EndpointService>,
 }
 
 impl ServiceContainer {
     pub fn new(infra_container: &Arc<InfraContainer>) -> Self {
-        let settings_service = Arc::new(SettingsServiceImpl::new(
+        let settings_service = Arc::new(EndpointServiceImpl::new(
             infra_container.mock_repository.clone(),
         ));
 

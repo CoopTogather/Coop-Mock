@@ -1,23 +1,16 @@
 use std::{ops::Deref, sync::Arc};
 
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
-use crate::infrastructure::models::end_points;
+use crate::{
+    domain::repositories::endpoint::EndpointRepository, infrastructure::models::end_points,
+};
 
-pub struct SettingsRepositoryImpl {
+pub struct EndpointRepositoryImpl {
     pub pool: Arc<DatabaseConnection>,
 }
 
-#[async_trait::async_trait]
-pub trait SettingsRepository: Send + Sync {
-    async fn create_mock(&self, add_endpoint: end_points::ActiveModel) -> Result<(), &str>;
-
-    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<end_points::Model>, &str>;
-
-    async fn get_mocks(&self) -> Result<Vec<end_points::Model>, &str>;
-}
-
-impl SettingsRepositoryImpl {
+impl EndpointRepositoryImpl {
     pub fn new(connection_pool: Arc<DatabaseConnection>) -> Self {
         Self {
             pool: connection_pool,
@@ -26,7 +19,7 @@ impl SettingsRepositoryImpl {
 }
 
 #[async_trait::async_trait]
-impl SettingsRepository for SettingsRepositoryImpl {
+impl EndpointRepository for EndpointRepositoryImpl {
     async fn create_mock(&self, add_endpoint: end_points::ActiveModel) -> Result<(), &str> {
         let connection_pool = self.pool.deref();
 
@@ -61,7 +54,10 @@ impl SettingsRepository for SettingsRepositoryImpl {
     async fn get_mocks(&self) -> Result<Vec<end_points::Model>, &str> {
         let connection_pool = self.pool.deref();
 
-        let endpoints = end_points::Entity::find().all(connection_pool).await;
+        let endpoints = end_points::Entity::find()
+            .filter(end_points::Column::Enabled.eq(true))
+            .all(connection_pool)
+            .await;
 
         match endpoints {
             Ok(endpoints) => Ok(endpoints),
