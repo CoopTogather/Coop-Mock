@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TemplateScopeParameterImpl {
     pub name: String,
     pub scope_type: TemplateScopeTypesEnum,
@@ -8,7 +8,7 @@ pub trait TemplateScopeParameter {
     fn matches(&self, path_scope: &str) -> bool;
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TemplateScopeTypesEnum {
     String,
     Number,

@@ -9,3 +9,6 @@ coop-service.workspace = true
 poem = { version = "2.0.0" }
 serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
+
+[dev-dependencies]
+criterion = { version = "0.5.1", features = ["html_reports"] }
