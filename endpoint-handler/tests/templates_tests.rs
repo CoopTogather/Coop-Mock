@@ -1,26 +1,29 @@
-use endpoint_handler::endpoint_template::TemplateImpl;
+use endpoint_handler::endpoint_template::{parameter::TemplateScopeTypesEnum, TemplateImpl};
 
 #[test]
 pub fn endpoint_path_string_convert_to_template() {
-    let path = String::from("/mock/{id:u32}");
+    let path = String::from("/mock/{id:string}");
     let method = String::from("POST");
     let template_path = TemplateImpl::new(path, method, None);
 
     assert_eq!(template_path.paths.len(), 2);
 
     assert_eq!(template_path.paths[0].scope, "mock");
-    assert_eq!(template_path.paths[0].is_parameter, false);
-    assert_eq!(template_path.paths[0].parameter_name, None);
+    assert!(template_path.paths[0].parameter.is_none());
 
-    assert_eq!(template_path.paths[1].scope, "id");
-    assert_eq!(template_path.paths[1].is_parameter, true);
+    assert_eq!(template_path.paths[1].scope, "{id:string}");
+    assert!(template_path.paths[1].parameter.is_some());
     assert_eq!(
-        template_path.paths[1].parameter_name,
-        Some(String::from("{id:u32}"))
+        template_path.paths[1].parameter.as_ref().unwrap().name,
+        String::from("id")
     );
     assert_eq!(
-        template_path.paths[1].parameter_type,
-        Some(String::from("u32"))
+        template_path.paths[1]
+            .parameter
+            .as_ref()
+            .unwrap()
+            .scope_type,
+        TemplateScopeTypesEnum::String
     );
 }
 
@@ -30,7 +33,7 @@ mod template_matches_tests {
 
     #[test]
     pub fn endpoint_matches_with_single_parameter() {
-        let path = String::from("/mock/{id:u32}");
+        let path = String::from("/mock/{id:number}");
         let method = String::from("POST");
         let template_path = TemplateImpl::new(path, method, None);
 
@@ -47,7 +50,7 @@ mod template_matches_tests {
 
     #[test]
     pub fn endpoint_matches_with_path_after_parameter() {
-        let path = String::from("/mock/{id:u32}/list");
+        let path = String::from("/mock/{id:number}/list");
         let method = String::from("POST");
         let template_path = TemplateImpl::new(path, method, None);
 

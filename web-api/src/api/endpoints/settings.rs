@@ -9,8 +9,6 @@ use poem::{
 
 use std::sync::Arc;
 
-use crate::api::models::settings_models::CreateSettingsRequestDto;
-
 pub fn settings_routes() -> Route {
     Route::new()
         .at("/endpoints", get(get_mocks))
@@ -19,7 +17,7 @@ pub fn settings_routes() -> Route {
 
 #[handler]
 pub async fn create_mock(
-    Json(create_dto): Json<CreateSettingsRequestDto>,
+    Json(create_dto): Json<CreateEndpointDto>,
     app_container: Data<&Arc<AppContainer>>,
 ) -> impl IntoResponse {
     let settings_service = &app_container.services_container.settings_service;
