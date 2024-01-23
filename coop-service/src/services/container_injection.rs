@@ -5,7 +5,7 @@ use crate::{
     infrastructure::container_injection::InfraContainer,
 };
 
-use super::settings_service::EndpointServiceImpl;
+use super::endpoint::EndpointServiceImpl;
 
 pub struct ServiceContainer {
     pub settings_service: Arc<dyn EndpointService>,

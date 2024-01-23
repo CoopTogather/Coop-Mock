@@ -6,7 +6,7 @@ use crate::domain::repositories::endpoint::EndpointRepository;
 
 use super::{
     databases::{get_connection_string, postgre::create_db_pool},
-    repositories::endpoint::EndpointRepositoryImpl,
+    repositories::postgres::endpoint::EndpointRepositoryImpl,
 };
 
 pub struct InfraContainer {

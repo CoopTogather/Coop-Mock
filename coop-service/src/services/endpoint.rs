@@ -1,10 +1,7 @@
 use std::sync::Arc;
 
 use crate::domain::{
-    models::{
-        endpoints::{CreateEndpointDto, EndpointDto},
-        CommandModel,
-    },
+    models::endpoints::{CreateEndpointDto, EndpointDto},
     repositories::endpoint::EndpointRepository,
     services::endpoint::EndpointService,
 };
@@ -24,10 +21,7 @@ impl EndpointServiceImpl {
 #[async_trait::async_trait]
 impl EndpointService for EndpointServiceImpl {
     async fn create_mock(&self, settings: CreateEndpointDto) -> Result<(), &str> {
-        let result = self
-            .settings_repository
-            .create_mock(settings.to_active_model())
-            .await;
+        let result = self.settings_repository.create_mock(settings).await;
 
         result
     }
@@ -36,19 +30,16 @@ impl EndpointService for EndpointServiceImpl {
         let result = self.settings_repository.get_mock(id).await;
 
         match result {
-            Ok(endpoint) => Ok(EndpointDto::from(endpoint)),
+            Ok(endpoint) => Ok(endpoint),
             Err(err) => Err(err),
         }
     }
 
-    async fn get_mocks(&self) -> Result<Vec<Option<EndpointDto>>, &str> {
+    async fn get_mocks(&self) -> Result<Vec<EndpointDto>, &str> {
         let result = self.settings_repository.get_mocks().await;
 
         match result {
-            Ok(endpoints) => Ok(endpoints
-                .into_iter()
-                .map(|e| EndpointDto::from(Some(e)))
-                .collect()),
+            Ok(endpoints) => Ok(endpoints),
             Err(err) => Err(err),
         }
     }

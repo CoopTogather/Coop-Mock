@@ -3,7 +3,14 @@ use std::{ops::Deref, sync::Arc};
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
 use crate::{
-    domain::repositories::endpoint::EndpointRepository, infrastructure::models::end_points,
+    domain::{
+        models::{
+            endpoints::{CreateEndpointDto, EndpointDto},
+            CommandModel,
+        },
+        repositories::endpoint::EndpointRepository,
+    },
+    infrastructure::models::end_points,
 };
 
 pub struct EndpointRepositoryImpl {
@@ -20,10 +27,12 @@ impl EndpointRepositoryImpl {
 
 #[async_trait::async_trait]
 impl EndpointRepository for EndpointRepositoryImpl {
-    async fn create_mock(&self, add_endpoint: end_points::ActiveModel) -> Result<(), &str> {
+    async fn create_mock(&self, add_endpoint: CreateEndpointDto) -> Result<(), &str> {
+        let active_model = add_endpoint.to_active_model();
+
         let connection_pool = self.pool.deref();
 
-        match add_endpoint.insert(connection_pool).await {
+        match active_model.insert(connection_pool).await {
             Ok(endpoint) => {
                 println!("Endpoint created: {:?}", endpoint);
             }
@@ -35,7 +44,7 @@ impl EndpointRepository for EndpointRepositoryImpl {
         Ok(())
     }
 
-    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<end_points::Model>, &str> {
+    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<EndpointDto>, &str> {
         let connection_pool = self.pool.deref();
 
         let endpoint = end_points::Entity::find_by_id(endpoint_id)
@@ -43,7 +52,7 @@ impl EndpointRepository for EndpointRepositoryImpl {
             .await;
 
         match endpoint {
-            Ok(endpoint) => Ok(endpoint),
+            Ok(endpoint) => Ok(EndpointDto::from_option(endpoint)),
             Err(err) => {
                 println!("Error getting endpoint: {:?}", err);
                 Err("Error getting endpoint")
@@ -51,7 +60,7 @@ impl EndpointRepository for EndpointRepositoryImpl {
         }
     }
 
-    async fn get_mocks(&self) -> Result<Vec<end_points::Model>, &str> {
+    async fn get_mocks(&self) -> Result<Vec<EndpointDto>, &str> {
         let connection_pool = self.pool.deref();
 
         let endpoints = end_points::Entity::find()
@@ -60,7 +69,10 @@ impl EndpointRepository for EndpointRepositoryImpl {
             .await;
 
         match endpoints {
-            Ok(endpoints) => Ok(endpoints),
+            Ok(endpoints) => Ok(endpoints
+                .into_iter()
+                .map(|e| EndpointDto::from(e))
+                .collect()),
             Err(err) => {
                 println!("Error getting endpoints: {:?}", err);
                 Err("Error getting endpoints")
