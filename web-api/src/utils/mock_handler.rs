@@ -34,6 +34,8 @@ impl MockEndpointsHandler {
             caching.add_range(scope.as_str(), template);
         }
 
+        println!("mock endpoint templates loaded, count: {}", mock_data.len());
+
         Ok(Self { caching })
     }
 

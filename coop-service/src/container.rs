@@ -15,6 +15,8 @@ impl AppContainer {
         let infra_container = Arc::new(InfraContainer::new().await);
         let services_container = Arc::new(ServiceContainer::new(&infra_container));
 
+        println!("AppContainer created");
+
         Self {
             infra_container,
             services_container,
