@@ -1,21 +1,21 @@
 use std::{collections::HashMap, sync::Arc};
 
-use coop_service::{container::AppContainer, domain::models::endpoints::EndpointDto};
+use coop_service::container::AppContainer;
 use endpoint_handler::{
     caching::{TemplateCaching, TemplateCachingImpl},
     endpoint_template::TemplateImpl,
 };
-use poem::Endpoint;
 
 pub struct MockEndpointsHandler {
     pub caching: Arc<TemplateCachingImpl>,
 }
 
 impl MockEndpointsHandler {
-    pub async fn new(container: Arc<AppContainer>) -> Result<Self, &str> {
+    pub async fn new(container: Arc<AppContainer>) -> Result<Self, String> {
         let app_container = container.clone();
         let caching = Arc::new(TemplateCachingImpl::default());
-        let mock_endpoint_service = app_container.services_container.settings_service.clone();
+        let service_container = app_container.services_container.clone();
+        let mock_endpoint_service = service_container.settings_service.clone();
 
         let mock_data = mock_endpoint_service.get_mocks().await?;
 
@@ -45,7 +45,7 @@ impl MockEndpointsHandler {
         for template in templates {
             let first_scope = template.paths.first().unwrap();
             let entry = grouped_templates
-                .entry(first_scope.scope)
+                .entry(first_scope.scope.to_owned())
                 .or_insert(Vec::new());
 
             entry.push(template);

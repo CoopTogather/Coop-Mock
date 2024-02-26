@@ -17,7 +17,7 @@ pub trait TemplateCaching: Sync + Send {
 impl Default for TemplateCachingImpl {
     fn default() -> Self {
         Self {
-            templates: Default::default(),
+            templates: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 }

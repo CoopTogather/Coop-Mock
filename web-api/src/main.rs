@@ -15,7 +15,12 @@ async fn main() -> Result<(), std::io::Error> {
 
     let container = Arc::new(AppContainer::new().await);
 
-    let app = app.with(AddData::new(container));
+    let mock_handler =
+        Arc::new(utils::mock_handler::MockEndpointsHandler::new(container.clone()).await?);
+
+    let app = app
+        .with(AddData::new(container))
+        .with(AddData::new(mock_handler));
 
     Server::new(TcpListener::bind("0.0.0.0:3033"))
         .run(app)
