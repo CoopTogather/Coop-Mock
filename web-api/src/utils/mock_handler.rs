@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use coop_service::container::AppContainer;
+use coop_service::{container::AppContainer, errors::CustomError};
 use endpoint_handler::{
     caching::{TemplateCaching, TemplateCachingImpl},
     endpoint_template::TemplateImpl,
@@ -11,7 +11,7 @@ pub struct MockEndpointsHandler {
 }
 
 impl MockEndpointsHandler {
-    pub async fn new(container: Arc<AppContainer>) -> Result<Self, String> {
+    pub async fn new(container: Arc<AppContainer>) -> Result<Self, CustomError> {
         let app_container = container.clone();
         let caching = Arc::new(TemplateCachingImpl::default());
         let service_container = app_container.services_container.clone();
