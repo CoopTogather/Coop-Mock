@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
+use api::mocks::handle_mock_request;
 use coop_service::{container::AppContainer, errors::CustomError};
-use endpoint_handler::handle_mock_request;
 use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
 
 pub mod api;
@@ -22,7 +22,7 @@ async fn main() -> Result<(), CustomError> {
         .with(AddData::new(container))
         .with(AddData::new(mock_handler));
 
-    Server::new(TcpListener::bind("0.0.0.0:3033"))
+    Ok(Server::new(TcpListener::bind("0.0.0.0:3033"))
         .run(app)
-        .await?
+        .await?)
 }
