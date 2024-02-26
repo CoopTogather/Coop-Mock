@@ -48,7 +48,7 @@ impl EndpointDto {
 }
 
 impl CommandModel<end_points::ActiveModel> for CreateEndpointDto {
-    fn to_active_model(self) -> end_points::ActiveModel {
+    fn to_entity_model(self) -> end_points::ActiveModel {
         end_points::ActiveModel {
             id: ActiveValue::NotSet,
             name: ActiveValue::Set(self.name),

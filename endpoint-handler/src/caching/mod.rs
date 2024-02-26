@@ -5,7 +5,7 @@ use std::{
 
 use crate::endpoint_template::TemplateImpl;
 
-pub struct TemplatesCachingImpl {
+pub struct TemplateCachingImpl {
     pub templates: Arc<RwLock<HashMap<String, Vec<TemplateImpl>>>>,
 }
 
@@ -14,7 +14,7 @@ pub trait TemplateCaching: Sync + Send {
     fn add_range(&self, first_scope: &str, templates: Vec<TemplateImpl>);
 }
 
-impl Default for TemplatesCachingImpl {
+impl Default for TemplateCachingImpl {
     fn default() -> Self {
         Self {
             templates: Default::default(),
@@ -22,7 +22,7 @@ impl Default for TemplatesCachingImpl {
     }
 }
 
-impl TemplateCaching for TemplatesCachingImpl {
+impl TemplateCaching for TemplateCachingImpl {
     fn get(&self, first_scope: &str) -> Option<Vec<TemplateImpl>> {
         let template_hash = self.templates.read().unwrap();
 

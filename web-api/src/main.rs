@@ -5,6 +5,7 @@ use endpoint_handler::handle_mock_request;
 use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Server};
 
 pub mod api;
+pub mod utils;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {

@@ -1,11 +1,10 @@
-use std::{
-    fs::File,
-    io::{BufReader, Error},
-};
+use std::{fs::File, io::BufReader};
 
 use serde::de::DeserializeOwned;
 
-pub fn read_json_file<T>(path: &str) -> Result<T, Error>
+use crate::errors::CustomError;
+
+pub fn read_json_file<T>(path: &str) -> Result<T, CustomError>
 where
     T: DeserializeOwned,
 {

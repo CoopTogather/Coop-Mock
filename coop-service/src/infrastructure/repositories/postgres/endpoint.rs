@@ -1,6 +1,6 @@
 use std::{ops::Deref, sync::Arc};
 
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, ActiveModelTrait};
 
 use crate::{
     domain::{
@@ -28,7 +28,7 @@ impl EndpointRepositoryImpl {
 #[async_trait::async_trait]
 impl EndpointRepository for EndpointRepositoryImpl {
     async fn create_mock(&self, add_endpoint: CreateEndpointDto) -> Result<(), &str> {
-        let active_model = add_endpoint.to_active_model();
+        let active_model = add_endpoint.to_entity_model();
 
         let connection_pool = self.pool.deref();
 
