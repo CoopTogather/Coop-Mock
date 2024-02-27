@@ -16,7 +16,7 @@ async fn main() -> Result<(), CustomError> {
     let container = Arc::new(AppContainer::new().await);
 
     let mock_handler =
-        Arc::new(utils::mock_handler::MockEndpointsHandler::new(container.clone()).await);
+        Arc::new(utils::mock_handler::MockEndpointsHandler::new(container.clone()).await?);
 
     let app = app
         .with(AddData::new(container))
