@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use endpoint_handler::caching::TemplateCaching;
+use endpoint_handler::{caching::TemplateCaching, utils::path::first_scope};
 use poem::{handler, http::StatusCode, web::Data, IntoResponse, Request};
 
 use crate::utils::mock_handler::MockEndpointsHandler;
@@ -12,8 +12,13 @@ pub async fn handle_mock_request(
 ) -> impl IntoResponse {
     let path = req.uri().path();
     let mocks_handler = mocks_handler.clone();
+    let first_scope_path = first_scope(path);
 
-    let resp = mocks_handler.caching.get(path);
+    if first_scope_path.is_none() {
+        return StatusCode::NOT_FOUND;
+    }
+
+    let resp = mocks_handler.caching.get(first_scope_path.unwrap());
 
     match resp {
         Some(_) => StatusCode::OK,
