@@ -1,4 +1,5 @@
 use coop_service::domain::models::endpoints::EndpointDto;
+use poem::IntoResponse;
 
 use self::path::{TemplatePath, TemplatePathImpl};
 
@@ -13,8 +14,26 @@ pub struct TemplateImpl {
     pub options: options::MockOptions,
 }
 
+/// A trait representing a template for an endpoint.
 pub trait Template {
+    /// Checks if the template matches the given path and method.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The path to match against.
+    /// * `method` - The HTTP method to match against.
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the template matches the path and method, `false` otherwise.
     fn matches(&self, path: &str, method: &str) -> bool;
+
+    /// Converts the template into a response.
+    ///
+    /// # Returns
+    ///
+    /// Returns an implementation of the `IntoResponse` trait that represents the response.
+    fn into_response(&self) -> impl IntoResponse;
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -81,6 +100,17 @@ impl Template for TemplateImpl {
         }
 
         true
+    }
+
+    fn into_response(&self) -> impl IntoResponse {
+        let response = self.options.response.clone();
+
+        match response {
+            Some(res) => res,
+            None => poem::Response::builder()
+                .status(poem::http::StatusCode::OK)
+                .body("".to_string()),
+        }
     }
 }
 

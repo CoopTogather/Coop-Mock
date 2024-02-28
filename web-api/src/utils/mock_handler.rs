@@ -31,7 +31,7 @@ impl MockEndpointsHandler {
             let scope = scope.to_owned();
             let template = temp.to_owned();
 
-            caching.add_range(scope.as_str(), template);
+            caching.add_template_vec(scope.as_str(), template);
         }
 
         println!("mock endpoint templates loaded, count: {}", mock_data.len());
