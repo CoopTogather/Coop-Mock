@@ -1,7 +1,10 @@
 use coop_service::domain::models::endpoints::EndpointDto;
 use poem::{IntoResponse, Response};
 
-use self::path::{TemplatePath, TemplatePathImpl};
+use self::{
+    options::MockResponse,
+    path::{TemplatePath, TemplatePathImpl},
+};
 
 pub mod options;
 pub mod parameter;
@@ -94,10 +97,7 @@ impl Template for TemplateImpl {
         let response = self.options.response.clone();
 
         match response {
-            Some(res) => poem::Response::builder()
-                .status(poem::http::StatusCode::OK)
-                .body("".to_string())
-                .into_response(),
+            Some(res) => res.into_response(),
             None => poem::Response::builder()
                 .status(poem::http::StatusCode::OK)
                 .body("".to_string())
