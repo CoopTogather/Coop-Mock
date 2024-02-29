@@ -1,5 +1,5 @@
 use coop_service::domain::models::endpoints::EndpointDto;
-use poem::IntoResponse;
+use poem::{IntoResponse, Response};
 
 use self::path::{TemplatePath, TemplatePathImpl};
 
@@ -33,7 +33,7 @@ pub trait Template {
     /// # Returns
     ///
     /// Returns an implementation of the `IntoResponse` trait that represents the response.
-    fn into_response(&self) -> impl IntoResponse;
+    fn into_response(&self) -> Response;
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -45,18 +45,6 @@ pub enum HttpMethod {
     PATCH,
 }
 
-/// Template is a struct that represents a mock endpoint template.
-/// It is used to match incoming requests to a mock endpoint.
-/// # Example
-/// ```
-/// use endpoint_handler::endpoint_template::TemplateImpl;
-///
-/// let path = String::from("/mock/{id:number}");
-///
-/// let template_path = TemplateImpl::new(path, String::from("POST"), None);
-///
-/// assert_eq!(template_path.paths.len(), 2);
-/// ```
 impl TemplateImpl {
     pub fn new(path: String, method: String, options: Option<serde_json::Value>) -> Self {
         Self {
@@ -102,14 +90,18 @@ impl Template for TemplateImpl {
         true
     }
 
-    fn into_response(&self) -> impl IntoResponse {
+    fn into_response(&self) -> Response {
         let response = self.options.response.clone();
 
         match response {
-            Some(res) => res,
+            Some(res) => poem::Response::builder()
+                .status(poem::http::StatusCode::OK)
+                .body("".to_string())
+                .into_response(),
             None => poem::Response::builder()
                 .status(poem::http::StatusCode::OK)
-                .body("".to_string()),
+                .body("".to_string())
+                .into_response(),
         }
     }
 }

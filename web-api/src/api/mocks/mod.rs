@@ -1,8 +1,6 @@
 use std::sync::Arc;
 
-use endpoint_handler::{
-    caching::TemplateCaching, endpoint_template::Template, utils::path::first_scope,
-};
+use endpoint_handler::{caching::TemplateCaching, endpoint_template::Template};
 use poem::{handler, http::StatusCode, web::Data, IntoResponse, Request};
 
 use crate::utils::mock_handler::MockEndpointsHandler;
@@ -19,9 +17,8 @@ pub async fn handle_mock_request(
         .caching
         .find_template(path, req.method().as_str());
 
-    if let Some(template) = match_template {
-        return template.into_response();
+    match match_template {
+        Some(template) => template.into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
     }
-
-    StatusCode::NOT_FOUND
 }
