@@ -1,14 +1,12 @@
 use coop_service::domain::models::endpoints::EndpointDto;
 use poem::{IntoResponse, Response};
 
-use self::{
-    options::MockResponse,
-    path::{TemplatePath, TemplatePathImpl},
-};
+use self::path::{TemplatePath, TemplatePathImpl};
 
 pub mod options;
 pub mod parameter;
 pub mod path;
+pub mod response;
 
 #[derive(Clone)]
 pub struct TemplateImpl {
