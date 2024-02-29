@@ -1,10 +1,12 @@
 use coop_service::domain::models::endpoints::EndpointDto;
+use poem::{IntoResponse, Response};
 
 use self::path::{TemplatePath, TemplatePathImpl};
 
 pub mod options;
 pub mod parameter;
 pub mod path;
+pub mod response;
 
 #[derive(Clone)]
 pub struct TemplateImpl {
@@ -13,8 +15,26 @@ pub struct TemplateImpl {
     pub options: options::MockOptions,
 }
 
+/// A trait representing a template for an endpoint.
 pub trait Template {
+    /// Checks if the template matches the given path and method.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The path to match against.
+    /// * `method` - The HTTP method to match against.
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the template matches the path and method, `false` otherwise.
     fn matches(&self, path: &str, method: &str) -> bool;
+
+    /// Converts the template into a response.
+    ///
+    /// # Returns
+    ///
+    /// Returns an implementation of the `IntoResponse` trait that represents the response.
+    fn into_response(&self) -> Response;
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -26,18 +46,6 @@ pub enum HttpMethod {
     PATCH,
 }
 
-/// Template is a struct that represents a mock endpoint template.
-/// It is used to match incoming requests to a mock endpoint.
-/// # Example
-/// ```
-/// use endpoint_handler::endpoint_template::TemplateImpl;
-///
-/// let path = String::from("/mock/{id:number}");
-///
-/// let template_path = TemplateImpl::new(path, String::from("POST"), None);
-///
-/// assert_eq!(template_path.paths.len(), 2);
-/// ```
 impl TemplateImpl {
     pub fn new(path: String, method: String, options: Option<serde_json::Value>) -> Self {
         Self {
@@ -81,6 +89,18 @@ impl Template for TemplateImpl {
         }
 
         true
+    }
+
+    fn into_response(&self) -> Response {
+        let response = self.options.response.clone();
+
+        match response {
+            Some(res) => res.into_response(),
+            None => poem::Response::builder()
+                .status(poem::http::StatusCode::OK)
+                .body("".to_string())
+                .into_response(),
+        }
     }
 }
 

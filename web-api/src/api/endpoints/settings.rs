@@ -22,16 +22,7 @@ pub async fn create_mock(
 ) -> impl IntoResponse {
     let settings_service = &app_container.services_container.settings_service;
 
-    let result = settings_service
-        .create_mock(CreateEndpointDto {
-            name: create_dto.name,
-            path: create_dto.path,
-            options: create_dto.options,
-            enabled: create_dto.enabled,
-            method: create_dto.method,
-            description: None,
-        })
-        .await;
+    let result = settings_service.create_mock(create_dto).await;
 
     match result {
         Ok(_) => StatusCode::CREATED,

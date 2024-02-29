@@ -1,14 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MockOptions {
-    pub response: Option<MockResponse>,
-}
+use super::response::MockResponseImpl;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MockResponse {
-    pub status_code: i16,
-    pub body: Option<String>,
+pub struct MockOptions {
+    pub response: Option<MockResponseImpl>,
 }
 
 impl Default for MockOptions {
