@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MockResponseImpl {
     status_code: u16,
-    body: Option<String>,
+    body: Option<serde_json::Value>,
 }
 
 /// Represents a trait for generating mock responses.
@@ -22,7 +22,10 @@ impl MockResponse for MockResponseImpl {
     }
 
     fn body(&self) -> Option<String> {
-        self.body.clone()
+        match &self.body {
+            Some(b) => Some(b.to_string()),
+            None => None,
+        }
     }
 }
 
@@ -35,6 +38,7 @@ impl IntoResponse for MockResponseImpl {
 
         Response::builder()
             .status(StatusCode::from_u16(self.status_code).unwrap())
+            .content_type("application/json")
             .body(body)
             .into_response()
     }
