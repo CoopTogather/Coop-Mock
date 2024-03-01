@@ -10,6 +10,14 @@ pub struct MockEndpointsHandler {
     pub caching: Arc<TemplateCachingImpl>,
 }
 
+pub trait MockEndpointsLoader {
+    fn load_mock_endpoints(&self) -> Result<(), CustomError>;
+}
+
+pub trait MockEndpointsProvider {
+    fn get_mock_endpoints(&self) -> Result<Vec<TemplateImpl>, CustomError>;
+}
+
 impl MockEndpointsHandler {
     pub async fn new(container: Arc<AppContainer>) -> Result<Self, CustomError> {
         let app_container = container.clone();
