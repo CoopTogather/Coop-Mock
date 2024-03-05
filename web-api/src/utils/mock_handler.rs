@@ -1,29 +1,43 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, ops::Deref, sync::Arc};
 
 use coop_service::{container::AppContainer, errors::CustomError};
 use endpoint_handler::{
     caching::{TemplateCaching, TemplateCachingImpl},
-    endpoint_template::TemplateImpl,
+    endpoint_template::{Template, TemplateImpl},
 };
+use poem::Request;
 
-pub struct MockEndpointsHandler {
-    pub caching: Arc<TemplateCachingImpl>,
+pub struct DatabaseMockHandlerImpl {
+    caching: Arc<TemplateCachingImpl>,
+    app_container: Arc<AppContainer>,
 }
 
-pub trait MockEndpointsLoader {
-    fn load_mock_endpoints(&self) -> Result<(), CustomError>;
+pub trait MockEndpointHandler {
+    fn handle_mock_request(&self, request: &Request) -> Result<impl Template, CustomError>;
 }
 
-pub trait MockEndpointsProvider {
-    fn get_mock_endpoints(&self) -> Result<Vec<TemplateImpl>, CustomError>;
-}
-
-impl MockEndpointsHandler {
+impl DatabaseMockHandlerImpl {
     pub async fn new(container: Arc<AppContainer>) -> Result<Self, CustomError> {
-        let app_container = container.clone();
         let caching = Arc::new(TemplateCachingImpl::default());
-        let service_container = app_container.services_container.clone();
-        let mock_endpoint_service = service_container.settings_service.clone();
+        let app_container = container.clone();
+
+        Ok(Self {
+            caching,
+            app_container,
+        })
+    }
+
+    async fn retreive_templates_from_datasource(
+        &self,
+        request: &Request,
+    ) -> Result<dyn Template, CustomError> {
+        let path = request.uri().path().to_owned();
+        let container = self.app_container.clone().deref();
+        let mock_endpoint_service = container
+            .services_container
+            .clone()
+            .settings_service
+            .clone();
 
         let mock_data = mock_endpoint_service.get_mocks().await?;
 
@@ -39,12 +53,10 @@ impl MockEndpointsHandler {
             let scope = scope.to_owned();
             let template = temp.to_owned();
 
-            caching.add_template_vec(scope.as_str(), template);
+            self.caching.add_template_vec(scope.as_str(), template);
         }
 
-        println!("mock endpoint templates loaded, count: {}", mock_data.len());
-
-        Ok(Self { caching })
+        
     }
 
     fn group_templates_by_first_scope(
@@ -62,5 +74,28 @@ impl MockEndpointsHandler {
         }
 
         grouped_templates
+    }
+}
+
+impl MockEndpointHandler for DatabaseMockHandlerImpl {
+    fn handle_mock_request(&self, request: &Request) -> Result<impl Template, CustomError> {
+        let path = request.uri().path().to_owned();
+        let method = request.method().to_string();
+
+        let templates = self.caching.get_templates(path.as_str());
+
+        if templates.is_empty() {
+            self.retreive_templates_from_datasource(request)?;
+        }
+
+        let templates = self.caching.get_templates(path.as_str());
+
+        for template in templates {
+            if template.matches(path.as_str(), method.as_str()) {
+                return Ok(template);
+            }
+        }
+
+        Err(CustomError::NotFound)
     }
 }

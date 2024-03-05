@@ -3,12 +3,12 @@ use std::sync::Arc;
 use endpoint_handler::{caching::TemplateCaching, endpoint_template::Template};
 use poem::{handler, http::StatusCode, web::Data, IntoResponse, Request};
 
-use crate::utils::mock_handler::MockEndpointsHandler;
+use crate::utils::mock_handler::DatabaseMockHandlerImpl;
 
 #[handler]
 pub async fn handle_mock_request(
     req: &Request,
-    mocks_handler: Data<&Arc<MockEndpointsHandler>>,
+    mocks_handler: Data<&Arc<DatabaseMockHandlerImpl>>,
 ) -> impl IntoResponse {
     let path = req.uri().path();
     let mocks_handler = mocks_handler.clone();
