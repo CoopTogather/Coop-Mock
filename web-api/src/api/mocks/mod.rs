@@ -1,12 +1,12 @@
 use poem::{handler, http::StatusCode, web::Data, IntoResponse, Request};
 use std::sync::Arc;
 
-use crate::utils::mock_handler::MockEndpointHandler;
+use crate::utils::mock_handler::{DatabaseMockHandlerImpl, MockEndpointHandler};
 
 #[handler]
 pub async fn handle_mock_request(
     req: &Request,
-    mocks_handler: Data<&Arc<dyn MockEndpointHandler>>,
+    mocks_handler: Data<&Arc<DatabaseMockHandlerImpl>>,
 ) -> impl IntoResponse {
     let mocks_handler = mocks_handler.clone();
 

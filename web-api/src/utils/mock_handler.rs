@@ -6,7 +6,7 @@ use endpoint_handler::{
     endpoint_template::{Template, TemplateImpl},
     utils::path::first_scope,
 };
-use poem::{IntoResponse, Request, Response};
+use poem::{Request, Response};
 
 pub struct DatabaseMockHandlerImpl {
     caching: Arc<dyn TemplateCaching>,
