@@ -4,16 +4,18 @@ use coop_service::{container::AppContainer, errors::CustomError};
 use endpoint_handler::{
     caching::{TemplateCaching, TemplateCachingImpl},
     endpoint_template::{Template, TemplateImpl},
+    utils::path::first_scope,
 };
-use poem::Request;
+use poem::{IntoResponse, Request, Response};
 
 pub struct DatabaseMockHandlerImpl {
-    caching: Arc<TemplateCachingImpl>,
+    caching: Arc<dyn TemplateCaching>,
     app_container: Arc<AppContainer>,
 }
 
-pub trait MockEndpointHandler {
-    fn handle_mock_request(&self, request: &Request) -> Result<impl Template, CustomError>;
+#[async_trait::async_trait]
+pub trait MockEndpointHandler: Send + Sync {
+    async fn handle_mock_request(&self, request: &Request) -> Option<Response>;
 }
 
 impl DatabaseMockHandlerImpl {
@@ -27,27 +29,52 @@ impl DatabaseMockHandlerImpl {
         })
     }
 
-    async fn retreive_templates_from_datasource(
+    async fn try_get_template(&self, request: &Request) -> Option<impl Template> {
+        let template = self.try_get_template_from_cache(request);
+
+        if template.is_some() {
+            return template;
+        }
+
+        let template = self
+            .try_get_template_from_datasource_and_update_cache(request)
+            .await
+            .ok();
+
+        template
+    }
+
+    fn try_get_template_from_cache(&self, request: &Request) -> Option<TemplateImpl> {
+        let path = request.uri().path().to_owned();
+        let method = request.method().to_string();
+
+        self.caching.find_template(path.as_str(), method.as_str())
+    }
+
+    async fn try_get_template_from_datasource_and_update_cache(
         &self,
         request: &Request,
-    ) -> Result<dyn Template, CustomError> {
+    ) -> Result<TemplateImpl, CustomError> {
         let path = request.uri().path().to_owned();
-        let container = self.app_container.clone().deref();
-        let mock_endpoint_service = container
+        let first_scope = match first_scope(path.as_str()) {
+            Some(scope) => scope,
+            None => return Err(CustomError::ServiceError("No scope found".to_owned())),
+        };
+
+        let container = self.app_container.deref();
+        let endpoints_result = container
             .services_container
-            .clone()
             .settings_service
-            .clone();
+            .get_mocks_by_scope(first_scope)
+            .await?;
 
-        let mock_data = mock_endpoint_service.get_mocks().await?;
-
-        let templates: Vec<TemplateImpl> = mock_data
+        let templates: Vec<TemplateImpl> = endpoints_result
             .to_owned()
             .iter()
             .map(|mock| TemplateImpl::from(mock.to_owned()))
             .collect();
 
-        let grouped_templates = Self::group_templates_by_first_scope(templates);
+        let grouped_templates = Self::group_templates_by_first_scope(&templates);
 
         for (scope, temp) in grouped_templates.iter() {
             let scope = scope.to_owned();
@@ -56,11 +83,19 @@ impl DatabaseMockHandlerImpl {
             self.caching.add_template_vec(scope.as_str(), template);
         }
 
-        
+        let target_template = templates
+            .iter()
+            .find(|t| t.matches(path.as_str(), request.method().as_str()))
+            .cloned();
+
+        match target_template {
+            Some(template) => Ok(template),
+            None => Err(CustomError::ServiceError("No template found".to_owned())),
+        }
     }
 
     fn group_templates_by_first_scope(
-        templates: Vec<TemplateImpl>,
+        templates: &Vec<TemplateImpl>,
     ) -> HashMap<String, Vec<TemplateImpl>> {
         let mut grouped_templates: HashMap<String, Vec<TemplateImpl>> = HashMap::new();
 
@@ -70,32 +105,24 @@ impl DatabaseMockHandlerImpl {
                 .entry(first_scope.scope.to_owned())
                 .or_insert(Vec::new());
 
-            entry.push(template);
+            entry.push(template.to_owned());
         }
 
         grouped_templates
     }
 }
 
+#[async_trait::async_trait]
 impl MockEndpointHandler for DatabaseMockHandlerImpl {
-    fn handle_mock_request(&self, request: &Request) -> Result<impl Template, CustomError> {
-        let path = request.uri().path().to_owned();
-        let method = request.method().to_string();
+    async fn handle_mock_request(&self, request: &Request) -> Option<Response> {
+        let template = self.try_get_template(request).await;
 
-        let templates = self.caching.get_templates(path.as_str());
+        if template.is_some() {
+            let template = template.unwrap();
 
-        if templates.is_empty() {
-            self.retreive_templates_from_datasource(request)?;
+            return Some(template.into_response());
         }
 
-        let templates = self.caching.get_templates(path.as_str());
-
-        for template in templates {
-            if template.matches(path.as_str(), method.as_str()) {
-                return Ok(template);
-            }
-        }
-
-        Err(CustomError::NotFound)
+        None
     }
 }

@@ -49,4 +49,13 @@ impl EndpointService for EndpointServiceImpl {
             Err(err) => Err(errors::CustomError::ServiceError(err.to_string())),
         }
     }
+
+    async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, CustomError> {
+        let result = self.settings_repository.get_mocks_by_scope(scope).await;
+
+        match result {
+            Ok(endpoints) => Ok(endpoints),
+            Err(err) => Err(CustomError::ServiceError(err.to_string())),
+        }
+    }
 }
