@@ -10,7 +10,7 @@ pub mod utils;
 #[tokio::main]
 async fn main() -> Result<(), CustomError> {
     let app = Route::new()
-        .nest("/settings", api::endpoints::settings::settings_routes())
+        .nest("/__settings", api::endpoints::settings::settings_routes())
         .at("/*", handle_mock_request);
 
     let container = Arc::new(AppContainer::new().await);
