@@ -5,11 +5,12 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use crate::{
     domain::{
         models::{
-            endpoints::{CreateEndpointDto, EndpointDto},
+            endpoints::{CreateEndpointDto, EndpointDto, SearchEndpointDto},
             CommandModel,
         },
         repositories::endpoint::EndpointRepository,
     },
+    errors::CustomError,
     infrastructure::models::end_points,
 };
 
@@ -27,76 +28,67 @@ impl EndpointRepositoryImpl {
 
 #[async_trait::async_trait]
 impl EndpointRepository for EndpointRepositoryImpl {
-    async fn create_mock(&self, add_endpoint: CreateEndpointDto) -> Result<(), &str> {
+    async fn create_mock(&self, add_endpoint: CreateEndpointDto) -> Result<(), CustomError> {
         let active_model = add_endpoint.to_entity_model();
 
         let connection_pool = self.pool.deref();
 
-        match active_model.insert(connection_pool).await {
-            Ok(endpoint) => {
-                println!("Endpoint created: {:?}", endpoint);
-            }
-            Err(err) => {
-                println!("Error creating endpoint: {:?}", err);
-            }
-        };
+        active_model.insert(connection_pool).await?;
 
         Ok(())
     }
 
-    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<EndpointDto>, &str> {
+    async fn get_mock(&self, endpoint_id: i32) -> Result<Option<EndpointDto>, CustomError> {
         let connection_pool = self.pool.deref();
 
         let endpoint = end_points::Entity::find_by_id(endpoint_id)
             .one(connection_pool)
-            .await;
+            .await?;
 
-        match endpoint {
-            Ok(endpoint) => Ok(EndpointDto::from_option(endpoint)),
-            Err(err) => {
-                println!("Error getting endpoint: {:?}", err);
-                Err("Error getting endpoint")
-            }
-        }
+        Ok(EndpointDto::from_option(endpoint))
     }
 
-    async fn get_mocks(&self) -> Result<Vec<EndpointDto>, &str> {
+    async fn get_mocks(
+        &self,
+        search_params: SearchEndpointDto,
+    ) -> Result<Vec<EndpointDto>, CustomError> {
         let connection_pool = self.pool.deref();
+        let mut filter = end_points::Column::Enabled.eq(true);
+
+        if search_params.name.is_some() {
+            filter = filter.and(end_points::Column::Name.contains(search_params.name.unwrap()));
+        }
+
+        if search_params.path.is_some() {
+            filter = filter.and(end_points::Column::Path.contains(search_params.path.unwrap()));
+        }
 
         let endpoints = end_points::Entity::find()
-            .filter(end_points::Column::Enabled.eq(true))
+            .filter(filter)
             .all(connection_pool)
-            .await;
+            .await?;
 
-        match endpoints {
-            Ok(endpoints) => Ok(endpoints
-                .into_iter()
-                .map(|e| EndpointDto::from(e))
-                .collect()),
-            Err(err) => {
-                println!("Error getting endpoints: {:?}", err);
-                Err("Error getting endpoints")
-            }
-        }
+        let endpoints_dto = endpoints
+            .into_iter()
+            .map(|model| EndpointDto::from(model))
+            .collect();
+
+        Ok(endpoints_dto)
     }
 
-    async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, &str> {
+    async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, CustomError> {
         let connection_pool = self.pool.deref();
 
         let endpoints = end_points::Entity::find()
             .filter(end_points::Column::Path.starts_with(scope))
             .all(connection_pool)
-            .await;
+            .await?;
 
-        match endpoints {
-            Ok(endpoints) => Ok(endpoints
-                .into_iter()
-                .map(|e| EndpointDto::from(e))
-                .collect()),
-            Err(err) => {
-                println!("Error getting endpoints: {:?}", err);
-                Err("Error getting endpoints")
-            }
-        }
+        let endpoints_dto = endpoints
+            .into_iter()
+            .map(|e| EndpointDto::from(e))
+            .collect();
+
+        Ok(endpoints_dto)
     }
 }

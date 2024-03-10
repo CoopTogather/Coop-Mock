@@ -4,7 +4,9 @@ use chrono::format;
 
 use crate::{
     domain::{
-        models::endpoints::{CreateEndpointDto, EndpointDto},
+        models::endpoints::{
+            CreateEndpointDto, EndpointDto, SearchEndpointDto, SearchEndpointRequestDto,
+        },
         repositories::endpoint::EndpointRepository,
         services::endpoint::EndpointService,
     },
@@ -43,8 +45,12 @@ impl EndpointService for EndpointServiceImpl {
         }
     }
 
-    async fn get_mocks(&self) -> Result<Vec<EndpointDto>, errors::CustomError> {
-        let result = self.settings_repository.get_mocks().await;
+    async fn get_mocks(
+        &self,
+        search_dto: SearchEndpointRequestDto,
+    ) -> Result<Vec<EndpointDto>, errors::CustomError> {
+        let dto = SearchEndpointDto::from(search_dto);
+        let result = self.settings_repository.get_mocks(dto).await;
 
         match result {
             Ok(endpoints) => Ok(endpoints),

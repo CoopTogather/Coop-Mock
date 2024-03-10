@@ -13,6 +13,18 @@ pub struct CreateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
+#[derive(Clone, Serialize, Deserialize, Default)]
+pub struct SearchEndpointRequestDto {
+    pub name: Option<String>,
+    pub path: Option<String>,
+}
+
+#[derive(Clone, Default)]
+pub struct SearchEndpointDto {
+    pub name: Option<String>,
+    pub path: Option<String>,
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EndpointDto {
     pub name: String,
@@ -20,6 +32,15 @@ pub struct EndpointDto {
     pub method: String,
     pub description: Option<String>,
     pub options: Option<serde_json::Value>,
+}
+
+impl SearchEndpointDto {
+    pub fn from(request_dto: SearchEndpointRequestDto) -> Self {
+        Self {
+            name: request_dto.name,
+            path: request_dto.path,
+        }
+    }
 }
 
 impl EndpointDto {
