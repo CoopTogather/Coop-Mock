@@ -1,6 +1,6 @@
 use std::{ops::Deref, sync::Arc};
 
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, ActiveModelTrait};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
 use crate::{
     domain::{
@@ -65,6 +65,26 @@ impl EndpointRepository for EndpointRepositoryImpl {
 
         let endpoints = end_points::Entity::find()
             .filter(end_points::Column::Enabled.eq(true))
+            .all(connection_pool)
+            .await;
+
+        match endpoints {
+            Ok(endpoints) => Ok(endpoints
+                .into_iter()
+                .map(|e| EndpointDto::from(e))
+                .collect()),
+            Err(err) => {
+                println!("Error getting endpoints: {:?}", err);
+                Err("Error getting endpoints")
+            }
+        }
+    }
+
+    async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, &str> {
+        let connection_pool = self.pool.deref();
+
+        let endpoints = end_points::Entity::find()
+            .filter(end_points::Column::Path.starts_with(scope))
             .all(connection_pool)
             .await;
 

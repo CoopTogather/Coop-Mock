@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use chrono::format;
+
 use crate::{
     domain::{
         models::endpoints::{CreateEndpointDto, EndpointDto},
@@ -47,6 +49,19 @@ impl EndpointService for EndpointServiceImpl {
         match result {
             Ok(endpoints) => Ok(endpoints),
             Err(err) => Err(errors::CustomError::ServiceError(err.to_string())),
+        }
+    }
+
+    async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, CustomError> {
+        let scope_add_slash = format!("/{}", scope);
+        let result = self
+            .settings_repository
+            .get_mocks_by_scope(scope_add_slash.as_str())
+            .await;
+
+        match result {
+            Ok(endpoints) => Ok(endpoints),
+            Err(err) => Err(CustomError::ServiceError(err.to_string())),
         }
     }
 }
