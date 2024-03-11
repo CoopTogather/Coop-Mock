@@ -3,9 +3,9 @@ use coop_service::{
     domain::models::endpoints::{CreateEndpointDto, SearchEndpointRequestDto},
 };
 use poem::{
-    get, handler,
+    delete, get, handler,
     http::StatusCode,
-    post,
+    post, put,
     web::{Data, Json},
     Body, IntoResponse, Request, Response, Route,
 };
@@ -16,6 +16,8 @@ pub fn settings_routes() -> Route {
     Route::new()
         .at("/endpoints", get(get_mocks))
         .at("/endpoint", post(create_mock))
+        .at("/endpoint", put(update_mock))
+        .at("/endpoint", delete(delete_mock))
 }
 
 #[handler]
@@ -53,3 +55,9 @@ pub async fn get_mocks(
         Err(_) => Response::builder().status(StatusCode::NOT_FOUND).finish(),
     }
 }
+
+#[handler]
+pub async fn update_mock(app_container: Data<&Arc<AppContainer>>) {}
+
+#[handler]
+pub async fn delete_mock(app_container: Data<&Arc<AppContainer>>) {}

@@ -13,6 +13,15 @@ pub struct CreateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
+pub struct UpdateEndpointDto {
+    pub id: i32,
+    pub name: Option<String>,
+    pub path: Option<String>,
+    pub method: Option<String>,
+    pub description: Option<String>,
+    pub options: Option<serde_json::Value>,
+}
+
 #[derive(Clone, Serialize, Deserialize, Default)]
 pub struct SearchEndpointRequestDto {
     pub name: Option<String>,
@@ -27,6 +36,7 @@ pub struct SearchEndpointDto {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EndpointDto {
+    pub id: i32,
     pub name: String,
     pub path: String,
     pub method: String,
@@ -46,6 +56,7 @@ impl SearchEndpointDto {
 impl EndpointDto {
     pub fn from(model: end_points::Model) -> Self {
         Self {
+            id: model.id,
             name: model.name,
             path: model.path,
             method: model.method,
@@ -57,6 +68,7 @@ impl EndpointDto {
     pub fn from_option(model: Option<end_points::Model>) -> Option<Self> {
         match model {
             Some(inner_model) => Some(Self {
+                id: inner_model.id,
                 name: inner_model.name,
                 path: inner_model.path,
                 method: inner_model.method,
