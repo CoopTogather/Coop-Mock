@@ -1,5 +1,7 @@
 use crate::{
-    domain::models::endpoints::{CreateEndpointDto, EndpointDto, SearchEndpointDto},
+    domain::models::endpoints::{
+        CreateEndpointDto, EndpointDto, SearchEndpointDto, UpdateEndpointDto,
+    },
     errors::CustomError,
 };
 
@@ -15,4 +17,10 @@ pub trait EndpointRepository: Send + Sync {
     ) -> Result<Vec<EndpointDto>, CustomError>;
 
     async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, CustomError>;
+
+    async fn update_mock(&self, update_dto: UpdateEndpointDto) -> Result<(), CustomError>;
+
+    async fn delete_mock(&self, endpoint_id: i32) -> Result<(), CustomError>;
+
+    async fn toggle_mock(&self, endpoint_id: i32) -> Result<(), CustomError>;
 }

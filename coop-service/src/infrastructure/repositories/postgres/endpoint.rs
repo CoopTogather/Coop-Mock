@@ -1,12 +1,15 @@
 use std::{ops::Deref, sync::Arc};
 
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter,
+    Set,
+};
 
 use crate::{
     domain::{
         models::{
-            endpoints::{CreateEndpointDto, EndpointDto, SearchEndpointDto},
-            CommandModel,
+            endpoints::{CreateEndpointDto, EndpointDto, SearchEndpointDto, UpdateEndpointDto},
+            InsertCommandModel, UpdateCommandModel,
         },
         repositories::endpoint::EndpointRepository,
     },
@@ -90,5 +93,65 @@ impl EndpointRepository for EndpointRepositoryImpl {
             .collect();
 
         Ok(endpoints_dto)
+    }
+
+    async fn update_mock(&self, update_dto: UpdateEndpointDto) -> Result<(), CustomError> {
+        let connection_pool = self.pool.deref();
+
+        let original_endpoint = end_points::Entity::find_by_id(update_dto.id)
+            .one(connection_pool)
+            .await?;
+
+        if original_endpoint.is_none() {
+            return Err(CustomError::ServiceError("Endpoint not found.".to_string()));
+        }
+
+        let original_endpoint = original_endpoint.unwrap().into_active_model();
+
+        let update_endpoint = update_dto.set_update_active_model(original_endpoint);
+
+        update_endpoint.update(connection_pool).await?;
+
+        Ok(())
+    }
+
+    async fn delete_mock(&self, endpoint_id: i32) -> Result<(), CustomError> {
+        let connection_pool = self.pool.deref();
+
+        let endpoint = end_points::Entity::find_by_id(endpoint_id)
+            .one(connection_pool)
+            .await?;
+
+        if endpoint.is_none() {
+            return Err(CustomError::ServiceError("Endpoint not found.".to_string()));
+        }
+
+        let endpoint = endpoint.unwrap().into_active_model();
+
+        endpoint.delete(connection_pool).await?;
+
+        Ok(())
+    }
+
+    async fn toggle_mock(&self, endpoint_id: i32) -> Result<(), CustomError> {
+        let connection_pool = self.pool.deref();
+
+        let endpoint = end_points::Entity::find_by_id(endpoint_id)
+            .one(connection_pool)
+            .await?;
+
+        if endpoint.is_none() {
+            return Err(CustomError::ServiceError("Endpoint not found.".to_string()));
+        }
+
+        let mut endpoint = endpoint.unwrap().into_active_model();
+
+        let enabled = endpoint.enabled.clone().unwrap();
+
+        endpoint.enabled = Set(!enabled);
+
+        endpoint.update(connection_pool).await?;
+
+        Ok(())
     }
 }

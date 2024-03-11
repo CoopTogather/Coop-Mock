@@ -1,5 +1,3 @@
-use sea_orm::error;
-
 #[derive(thiserror::Error, Debug)]
 pub enum CustomError {
     #[error("An error from serde_json, may cause by invalid json format. {0}")]

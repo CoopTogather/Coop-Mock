@@ -1,11 +1,13 @@
 use coop_service::{
     container::AppContainer,
-    domain::models::endpoints::{CreateEndpointDto, SearchEndpointRequestDto},
+    domain::models::endpoints::{
+        CreateEndpointDto, SearchEndpointRequestDto, UpdateEndpointRequestDto,
+    },
 };
 use poem::{
     delete, get, handler,
     http::StatusCode,
-    post, put,
+    patch, post, put,
     web::{Data, Json},
     Body, IntoResponse, Request, Response, Route,
 };
@@ -17,6 +19,7 @@ pub fn settings_routes() -> Route {
         .at("/endpoints", get(get_mocks))
         .at("/endpoint", post(create_mock))
         .at("/endpoint", put(update_mock))
+        .at("/endpoint/toggle", patch(toggle_mock))
         .at("/endpoint", delete(delete_mock))
 }
 
@@ -57,7 +60,17 @@ pub async fn get_mocks(
 }
 
 #[handler]
-pub async fn update_mock(app_container: Data<&Arc<AppContainer>>) {}
+pub async fn update_mock(
+    Json(update_request): Json<UpdateEndpointRequestDto>,
+    app_container: Data<&Arc<AppContainer>>,
+) {
+    let settings_service = &app_container.services_container.settings_service;
+
+    let result = settings_service.update_mock(update_request).await;
+}
 
 #[handler]
 pub async fn delete_mock(app_container: Data<&Arc<AppContainer>>) {}
+
+#[handler]
+pub async fn toggle_mock(app_container: Data<&Arc<AppContainer>>) {}

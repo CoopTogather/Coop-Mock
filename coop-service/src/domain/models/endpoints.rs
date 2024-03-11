@@ -1,6 +1,6 @@
-use super::CommandModel;
+use super::{InsertCommandModel, UpdateCommandModel};
 use crate::infrastructure::models::end_points;
-use sea_orm::ActiveValue;
+use sea_orm::{ActiveValue, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -13,6 +13,17 @@ pub struct CreateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub struct UpdateEndpointRequestDto {
+    pub id: i32,
+    pub name: Option<String>,
+    pub path: Option<String>,
+    pub method: Option<String>,
+    pub description: Option<String>,
+    pub options: Option<serde_json::Value>,
+}
+
+#[derive(Clone, Default)]
 pub struct UpdateEndpointDto {
     pub id: i32,
     pub name: Option<String>,
@@ -44,8 +55,21 @@ pub struct EndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
+impl UpdateEndpointDto {
+    pub fn from_request(request_dto: UpdateEndpointRequestDto) -> Self {
+        Self {
+            id: request_dto.id,
+            name: request_dto.name,
+            path: request_dto.path,
+            method: request_dto.method,
+            description: request_dto.description,
+            options: request_dto.options,
+        }
+    }
+}
+
 impl SearchEndpointDto {
-    pub fn from(request_dto: SearchEndpointRequestDto) -> Self {
+    pub fn from_request(request_dto: SearchEndpointRequestDto) -> Self {
         Self {
             name: request_dto.name,
             path: request_dto.path,
@@ -80,7 +104,7 @@ impl EndpointDto {
     }
 }
 
-impl CommandModel<end_points::ActiveModel> for CreateEndpointDto {
+impl InsertCommandModel<end_points::ActiveModel> for CreateEndpointDto {
     fn to_entity_model(self) -> end_points::ActiveModel {
         end_points::ActiveModel {
             id: ActiveValue::NotSet,
@@ -93,5 +117,26 @@ impl CommandModel<end_points::ActiveModel> for CreateEndpointDto {
             created_at: ActiveValue::Set(chrono::Utc::now().naive_utc()),
             updated_at: ActiveValue::Set(chrono::Utc::now().naive_utc()),
         }
+    }
+}
+
+impl UpdateCommandModel<end_points::ActiveModel, UpdateEndpointDto> for UpdateEndpointDto {
+    fn set_update_active_model(
+        &self,
+        mut active_model: end_points::ActiveModel,
+    ) -> end_points::ActiveModel {
+        if self.name.is_some() {
+            active_model.name = Set(self.name.to_owned().unwrap());
+        }
+
+        if self.path.is_some() {
+            active_model.path = Set(self.path.to_owned().unwrap());
+        }
+
+        active_model.description = Set(self.to_owned().description);
+
+        active_model.options = Set(self.to_owned().options);
+
+        active_model
     }
 }

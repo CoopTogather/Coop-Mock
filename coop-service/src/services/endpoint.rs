@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use chrono::format;
-
 use crate::{
     domain::{
         models::endpoints::{
@@ -49,7 +47,7 @@ impl EndpointService for EndpointServiceImpl {
         &self,
         search_dto: SearchEndpointRequestDto,
     ) -> Result<Vec<EndpointDto>, errors::CustomError> {
-        let dto = SearchEndpointDto::from(search_dto);
+        let dto = SearchEndpointDto::from_request(search_dto);
         let result = self.settings_repository.get_mocks(dto).await;
 
         match result {
