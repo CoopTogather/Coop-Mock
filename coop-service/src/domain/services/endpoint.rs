@@ -15,4 +15,6 @@ pub trait EndpointService: Sync + Send {
     ) -> Result<Vec<EndpointDto>, CustomError>;
     async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, CustomError>;
     async fn update_mock(&self, settings: UpdateEndpointRequestDto) -> Result<(), CustomError>;
+    async fn delete_mock(&self, id: i32) -> Result<(), CustomError>;
+    async fn toggle_mock(&self, id: i32) -> Result<(), CustomError>;
 }

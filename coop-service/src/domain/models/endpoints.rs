@@ -3,6 +3,7 @@ use crate::infrastructure::models::end_points;
 use sea_orm::{ActiveValue, Set};
 use serde::{Deserialize, Serialize};
 
+/// DTO for creating an endpoint.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct CreateEndpointDto {
     pub name: String,
@@ -13,6 +14,7 @@ pub struct CreateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
+/// DTO for updating an endpoint.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UpdateEndpointRequestDto {
     pub id: i32,
@@ -23,6 +25,7 @@ pub struct UpdateEndpointRequestDto {
     pub options: Option<serde_json::Value>,
 }
 
+/// DTO for updating an endpoint (used internally).
 #[derive(Clone, Default)]
 pub struct UpdateEndpointDto {
     pub id: i32,
@@ -33,18 +36,21 @@ pub struct UpdateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
+/// DTO for searching endpoints.
 #[derive(Clone, Serialize, Deserialize, Default)]
 pub struct SearchEndpointRequestDto {
     pub name: Option<String>,
     pub path: Option<String>,
 }
 
+/// DTO for searching endpoints (used internally).
 #[derive(Clone, Default)]
 pub struct SearchEndpointDto {
     pub name: Option<String>,
     pub path: Option<String>,
 }
 
+/// DTO representing an endpoint.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EndpointDto {
     pub id: i32,
@@ -56,6 +62,7 @@ pub struct EndpointDto {
 }
 
 impl UpdateEndpointDto {
+    /// Converts an `UpdateEndpointRequestDto` to an `UpdateEndpointDto`.
     pub fn from_request(request_dto: UpdateEndpointRequestDto) -> Self {
         Self {
             id: request_dto.id,
@@ -69,6 +76,7 @@ impl UpdateEndpointDto {
 }
 
 impl SearchEndpointDto {
+    /// Converts a `SearchEndpointRequestDto` to a `SearchEndpointDto`.
     pub fn from_request(request_dto: SearchEndpointRequestDto) -> Self {
         Self {
             name: request_dto.name,
@@ -78,6 +86,7 @@ impl SearchEndpointDto {
 }
 
 impl EndpointDto {
+    /// Converts an `end_points::Model` to an `EndpointDto`.
     pub fn from(model: end_points::Model) -> Self {
         Self {
             id: model.id,
@@ -89,6 +98,7 @@ impl EndpointDto {
         }
     }
 
+    /// Converts an optional `end_points::Model` to an optional `EndpointDto`.
     pub fn from_option(model: Option<end_points::Model>) -> Option<Self> {
         match model {
             Some(inner_model) => Some(Self {
@@ -105,6 +115,7 @@ impl EndpointDto {
 }
 
 impl InsertCommandModel<end_points::ActiveModel> for CreateEndpointDto {
+    /// Converts a `CreateEndpointDto` to an `end_points::ActiveModel`.
     fn to_entity_model(self) -> end_points::ActiveModel {
         end_points::ActiveModel {
             id: ActiveValue::NotSet,
@@ -121,6 +132,7 @@ impl InsertCommandModel<end_points::ActiveModel> for CreateEndpointDto {
 }
 
 impl UpdateCommandModel<end_points::ActiveModel, UpdateEndpointDto> for UpdateEndpointDto {
+    /// Sets the update values of an `end_points::ActiveModel` based on the fields of the `UpdateEndpointDto`.
     fn set_update_active_model(
         &self,
         mut active_model: end_points::ActiveModel,
