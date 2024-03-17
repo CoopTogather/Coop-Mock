@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
-use chrono::format;
-
 use crate::{
     domain::{
-        models::endpoints::{CreateEndpointDto, EndpointDto},
+        models::endpoints::{
+            CreateEndpointDto, EndpointDto, SearchEndpointDto, SearchEndpointRequestDto,
+            UpdateEndpointDto, UpdateEndpointRequestDto,
+        },
         repositories::endpoint::EndpointRepository,
         services::endpoint::EndpointService,
     },
@@ -43,8 +44,12 @@ impl EndpointService for EndpointServiceImpl {
         }
     }
 
-    async fn get_mocks(&self) -> Result<Vec<EndpointDto>, errors::CustomError> {
-        let result = self.settings_repository.get_mocks().await;
+    async fn get_mocks(
+        &self,
+        search_dto: SearchEndpointRequestDto,
+    ) -> Result<Vec<EndpointDto>, errors::CustomError> {
+        let dto = SearchEndpointDto::from_request(search_dto);
+        let result = self.settings_repository.get_mocks(dto).await;
 
         match result {
             Ok(endpoints) => Ok(endpoints),
@@ -61,6 +66,36 @@ impl EndpointService for EndpointServiceImpl {
 
         match result {
             Ok(endpoints) => Ok(endpoints),
+            Err(err) => Err(CustomError::ServiceError(err.to_string())),
+        }
+    }
+
+    async fn update_mock(&self, settings: UpdateEndpointRequestDto) -> Result<(), CustomError> {
+        let result = self
+            .settings_repository
+            .update_mock(UpdateEndpointDto::from_request(settings))
+            .await;
+
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(CustomError::ServiceError(err.to_string())),
+        }
+    }
+
+    async fn delete_mock(&self, id: i32) -> Result<(), CustomError> {
+        let result = self.settings_repository.delete_mock(id).await;
+
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(CustomError::ServiceError(err.to_string())),
+        }
+    }
+
+    async fn toggle_mock(&self, id: i32) -> Result<(), CustomError> {
+        let result = self.settings_repository.toggle_mock(id).await;
+
+        match result {
+            Ok(_) => Ok(()),
             Err(err) => Err(CustomError::ServiceError(err.to_string())),
         }
     }

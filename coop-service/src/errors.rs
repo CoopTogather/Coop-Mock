@@ -4,6 +4,8 @@ pub enum CustomError {
     JsonError(#[from] serde_json::Error),
     #[error("An error from std::io")]
     IoError(#[from] std::io::Error),
+    #[error("An error from sea_orm")]
+    DbError(#[from] sea_orm::error::DbErr),
     #[error("An error from Service Layer: {0}")]
     ServiceError(String),
 }

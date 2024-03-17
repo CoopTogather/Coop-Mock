@@ -1,12 +1,14 @@
 use std::{collections::HashMap, ops::Deref, sync::Arc};
 
 use coop_service::{container::AppContainer, errors::CustomError};
-use endpoint_handler::{
+use poem::{Request, Response};
+
+use crate::{
     caching::{TemplateCaching, TemplateCachingImpl},
     endpoint_template::{Template, TemplateImpl},
-    utils::path::first_scope,
 };
-use poem::{Request, Response};
+
+use super::path::first_scope;
 
 pub struct DatabaseMockHandlerImpl {
     caching: Arc<dyn TemplateCaching>,
