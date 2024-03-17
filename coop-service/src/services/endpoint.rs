@@ -4,7 +4,7 @@ use crate::{
     domain::{
         models::endpoints::{
             CreateEndpointDto, EndpointDto, SearchEndpointDto, SearchEndpointRequestDto,
-            UpdateEndpointDto,
+            UpdateEndpointDto, UpdateEndpointRequestDto,
         },
         repositories::endpoint::EndpointRepository,
         services::endpoint::EndpointService,
@@ -70,8 +70,11 @@ impl EndpointService for EndpointServiceImpl {
         }
     }
 
-    async fn update_mock(&self, settings: UpdateEndpointDto) -> Result<(), CustomError> {
-        let result = self.settings_repository.update_mock(settings).await;
+    async fn update_mock(&self, settings: UpdateEndpointRequestDto) -> Result<(), CustomError> {
+        let result = self
+            .settings_repository
+            .update_mock(UpdateEndpointDto::from_request(settings))
+            .await;
 
         match result {
             Ok(_) => Ok(()),

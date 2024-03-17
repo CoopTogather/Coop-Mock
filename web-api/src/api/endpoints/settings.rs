@@ -4,11 +4,12 @@ use coop_service::{
         CreateEndpointDto, SearchEndpointRequestDto, UpdateEndpointRequestDto,
     },
 };
+use endpoint_handler::{endpoint_template::options::MockOptions, utils::validator::Validator};
 use poem::{
     delete, get, handler,
     http::StatusCode,
     patch, post, put,
-    web::{Data, Json},
+    web::{Data, Json, Path},
     Body, IntoResponse, Request, Response, Route,
 };
 
@@ -19,8 +20,8 @@ pub fn settings_routes() -> Route {
         .at("/endpoints", get(get_mocks))
         .at("/endpoint", post(create_mock))
         .at("/endpoint", put(update_mock))
-        .at("/endpoint/toggle", patch(toggle_mock))
-        .at("/endpoint", delete(delete_mock))
+        .at("/endpoint/:id/toggle", patch(toggle_mock))
+        .at("/endpoint/:id", delete(delete_mock))
 }
 
 #[handler]
@@ -63,14 +64,45 @@ pub async fn get_mocks(
 pub async fn update_mock(
     Json(update_request): Json<UpdateEndpointRequestDto>,
     app_container: Data<&Arc<AppContainer>>,
-) {
+) -> impl IntoResponse {
     let settings_service = &app_container.services_container.settings_service;
 
-    let result = settings_service.update_mock(update_request).await;
+    if update_request.options.is_some() {
+        let options = update_request.options.as_ref().unwrap();
+
+        if !MockOptions::is_valid(options) {
+            return StatusCode::BAD_REQUEST.into_response();
+        }
+    }
+
+    match settings_service.update_mock(update_request).await {
+        Ok(_) => StatusCode::OK.into_response(),
+        Err(_) => StatusCode::BAD_REQUEST.into_response(),
+    }
 }
 
 #[handler]
-pub async fn delete_mock(app_container: Data<&Arc<AppContainer>>) {}
+pub async fn delete_mock(
+    Path(id): Path<i32>,
+    app_container: Data<&Arc<AppContainer>>,
+) -> impl IntoResponse {
+    let settings_service = &app_container.services_container.settings_service;
+
+    match settings_service.delete_mock(id).await {
+        Ok(_) => StatusCode::OK.into_response(),
+        Err(_) => StatusCode::BAD_REQUEST.into_response(),
+    }
+}
 
 #[handler]
-pub async fn toggle_mock(app_container: Data<&Arc<AppContainer>>) {}
+pub async fn toggle_mock(
+    Path(id): Path<i32>,
+    app_container: Data<&Arc<AppContainer>>,
+) -> impl IntoResponse {
+    let settings_service = &app_container.services_container.settings_service;
+
+    match settings_service.toggle_mock(id).await {
+        Ok(_) => StatusCode::OK.into_response(),
+        Err(_) => StatusCode::BAD_REQUEST.into_response(),
+    }
+}

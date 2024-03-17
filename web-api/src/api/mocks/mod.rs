@@ -1,7 +1,6 @@
+use endpoint_handler::utils::mock_handler::{DatabaseMockHandlerImpl, MockEndpointHandler};
 use poem::{handler, http::StatusCode, web::Data, IntoResponse, Request};
 use std::sync::Arc;
-
-use crate::utils::mock_handler::{DatabaseMockHandlerImpl, MockEndpointHandler};
 
 #[handler]
 pub async fn handle_mock_request(
