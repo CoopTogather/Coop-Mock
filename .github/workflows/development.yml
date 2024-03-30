@@ -15,5 +15,6 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Build Docker image
-      run: docker build -t coop-mock . \
-        --build-arg DATABASE_URL=$ {{ secrets.DATABASE_URL }}
+      run: | 
+        docker build -t coop-mock . \
+          --build-arg DATABASE_URL="$ {{ secrets.DATABASE_URL }}"
