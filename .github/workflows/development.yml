@@ -27,7 +27,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: $ {{secrets.DOCKER_HUB_USERNAME}}/coop-mock:development
+        images: $ {{secrets.DOCKER_HUB_USERNAME}}/coop-mock
     - name: Build and push Docker image
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
       with:
