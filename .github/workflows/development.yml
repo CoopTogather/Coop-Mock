@@ -33,5 +33,5 @@ jobs:
         tags: ${{steps.meta.outputs.tags}}
         labels: ${{steps.meta.outputs.labels}}
         build-args: |
-          DATABASE_URL: ${{secrets.DATABASE_URL}}
+          DATABASE_URL=${{secrets.DATABASE_URL}}
       
