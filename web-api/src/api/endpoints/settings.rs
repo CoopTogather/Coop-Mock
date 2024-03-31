@@ -18,8 +18,8 @@ use std::sync::Arc;
 pub fn settings_routes() -> Route {
     Route::new()
         .at("/endpoints", get(get_mocks))
-        .at("/endpoint", post(create_mock))
-        .at("/endpoint", put(update_mock))
+        .at("/endpoint/add", post(create_mock))
+        .at("/endpoint/edit", put(update_mock))
         .at("/endpoint/:id/toggle", patch(toggle_mock))
         .at("/endpoint/:id", delete(delete_mock))
 }
