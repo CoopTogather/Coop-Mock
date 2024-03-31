@@ -14,6 +14,24 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-    - name: Build Docker image
-      run: docker build -t coop-mock . \
-        --build-arg DATABASE_URL=$ {{ secrets.DATABASE_URL }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{secrets.DOCKER_HUB_USERNAME}}
+        password: ${{secrets.DOCKER_HUB_PASSWORD}}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{secrets.DOCKER_HUB_USERNAME}}/coop-mock
+    - name: Build and push Docker image
+      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      with:
+        context: .
+        file: ./dockerfile
+        push: true
+        tags: ${{steps.meta.outputs.tags}}
+        labels: ${{steps.meta.outputs.labels}}
+        build-args: |
+          DATABASE_URL=${{secrets.DATABASE_URL}}
+      
