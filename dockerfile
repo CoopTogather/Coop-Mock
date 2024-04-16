@@ -12,5 +12,5 @@ COPY --from=builder ./usr/src/app/target/release/web-api .
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
-EXPOSE 3033
+EXPOSE 3000
 CMD ["./web-api"]
