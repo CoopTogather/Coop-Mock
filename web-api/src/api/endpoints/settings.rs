@@ -1,9 +1,4 @@
-use coop_service::{
-    container::AppContainer,
-    domain::models::endpoints::{
-        CreateEndpointDto, SearchEndpointRequestDto, UpdateEndpointRequestDto,
-    },
-};
+use coop_service::{container::AppContainer, domain::models::endpoints::CreateEndpointDto};
 use endpoint_handler::{endpoint_template::options::MockOptions, utils::validator::Validator};
 use poem::{
     delete, get, handler,
@@ -14,6 +9,8 @@ use poem::{
 };
 
 use std::sync::Arc;
+
+use crate::dtos::endpoint::{SearchEndpointRequestDto, UpdateEndpointRequestDto};
 
 pub fn settings_routes() -> Route {
     Route::new()
@@ -47,7 +44,7 @@ pub async fn get_mocks(
     let settings_service = &app_container.services_container.settings_service;
     let search_params = req.params::<SearchEndpointRequestDto>().unwrap_or_default();
 
-    let result = settings_service.get_mocks(search_params).await;
+    let result = settings_service.get_mocks(search_params.into()).await;
 
     match result {
         Ok(endpoints) => Response::builder()
@@ -75,7 +72,7 @@ pub async fn update_mock(
         }
     }
 
-    match settings_service.update_mock(update_request).await {
+    match settings_service.update_mock(update_request.into()).await {
         Ok(_) => StatusCode::OK.into_response(),
         Err(_) => StatusCode::BAD_REQUEST.into_response(),
     }

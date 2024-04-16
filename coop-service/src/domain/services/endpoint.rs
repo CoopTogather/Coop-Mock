@@ -1,6 +1,6 @@
 use crate::{
     domain::models::endpoints::{
-        CreateEndpointDto, EndpointDto, SearchEndpointRequestDto, UpdateEndpointRequestDto,
+        CreateEndpointDto, EndpointDto, SearchEndpointDto, UpdateEndpointDto,
     },
     errors::CustomError,
 };
@@ -11,10 +11,10 @@ pub trait EndpointService: Sync + Send {
     async fn get_mock(&self, id: i32) -> Result<Option<EndpointDto>, CustomError>;
     async fn get_mocks(
         &self,
-        search_dto: SearchEndpointRequestDto,
+        search_dto: SearchEndpointDto,
     ) -> Result<Vec<EndpointDto>, CustomError>;
     async fn get_mocks_by_scope(&self, scope: &str) -> Result<Vec<EndpointDto>, CustomError>;
-    async fn update_mock(&self, settings: UpdateEndpointRequestDto) -> Result<(), CustomError>;
+    async fn update_mock(&self, settings: UpdateEndpointDto) -> Result<(), CustomError>;
     async fn delete_mock(&self, id: i32) -> Result<(), CustomError>;
     async fn toggle_mock(&self, id: i32) -> Result<(), CustomError>;
 }
