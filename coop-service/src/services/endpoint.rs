@@ -2,10 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     domain::{
-        models::endpoints::{
-            CreateEndpointDto, EndpointDto, SearchEndpointDto, SearchEndpointRequestDto,
-            UpdateEndpointDto, UpdateEndpointRequestDto,
-        },
+        models::endpoints::{CreateEndpointDto, EndpointDto, SearchEndpointDto, UpdateEndpointDto},
         repositories::endpoint::EndpointRepository,
         services::endpoint::EndpointService,
     },
@@ -46,10 +43,9 @@ impl EndpointService for EndpointServiceImpl {
 
     async fn get_mocks(
         &self,
-        search_dto: SearchEndpointRequestDto,
+        search_dto: SearchEndpointDto,
     ) -> Result<Vec<EndpointDto>, errors::CustomError> {
-        let dto = SearchEndpointDto::from_request(search_dto);
-        let result = self.settings_repository.get_mocks(dto).await;
+        let result = self.settings_repository.get_mocks(search_dto).await;
 
         match result {
             Ok(endpoints) => Ok(endpoints),
@@ -70,11 +66,8 @@ impl EndpointService for EndpointServiceImpl {
         }
     }
 
-    async fn update_mock(&self, settings: UpdateEndpointRequestDto) -> Result<(), CustomError> {
-        let result = self
-            .settings_repository
-            .update_mock(UpdateEndpointDto::from_request(settings))
-            .await;
+    async fn update_mock(&self, settings: UpdateEndpointDto) -> Result<(), CustomError> {
+        let result = self.settings_repository.update_mock(settings).await;
 
         match result {
             Ok(_) => Ok(()),

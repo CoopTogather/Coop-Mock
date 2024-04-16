@@ -14,17 +14,6 @@ pub struct CreateEndpointDto {
     pub options: Option<serde_json::Value>,
 }
 
-/// DTO for updating an endpoint.
-#[derive(Clone, Serialize, Deserialize)]
-pub struct UpdateEndpointRequestDto {
-    pub id: i32,
-    pub name: Option<String>,
-    pub path: Option<String>,
-    pub method: Option<String>,
-    pub description: Option<String>,
-    pub options: Option<serde_json::Value>,
-}
-
 /// DTO for updating an endpoint (used internally).
 #[derive(Clone, Default)]
 pub struct UpdateEndpointDto {
@@ -34,13 +23,6 @@ pub struct UpdateEndpointDto {
     pub method: Option<String>,
     pub description: Option<String>,
     pub options: Option<serde_json::Value>,
-}
-
-/// DTO for searching endpoints.
-#[derive(Clone, Serialize, Deserialize, Default)]
-pub struct SearchEndpointRequestDto {
-    pub name: Option<String>,
-    pub path: Option<String>,
 }
 
 /// DTO for searching endpoints (used internally).
@@ -59,30 +41,6 @@ pub struct EndpointDto {
     pub method: String,
     pub description: Option<String>,
     pub options: Option<serde_json::Value>,
-}
-
-impl UpdateEndpointDto {
-    /// Converts an `UpdateEndpointRequestDto` to an `UpdateEndpointDto`.
-    pub fn from_request(request_dto: UpdateEndpointRequestDto) -> Self {
-        Self {
-            id: request_dto.id,
-            name: request_dto.name,
-            path: request_dto.path,
-            method: request_dto.method,
-            description: request_dto.description,
-            options: request_dto.options,
-        }
-    }
-}
-
-impl SearchEndpointDto {
-    /// Converts a `SearchEndpointRequestDto` to a `SearchEndpointDto`.
-    pub fn from_request(request_dto: SearchEndpointRequestDto) -> Self {
-        Self {
-            name: request_dto.name,
-            path: request_dto.path,
-        }
-    }
 }
 
 impl EndpointDto {

@@ -7,6 +7,7 @@ use poem::{listener::TcpListener, middleware::AddData, EndpointExt, Route, Serve
 
 pub mod api;
 pub mod common;
+pub mod dtos;
 
 #[tokio::main]
 async fn main() -> Result<(), CustomError> {
@@ -22,7 +23,7 @@ async fn main() -> Result<(), CustomError> {
         .with(AddData::new(container))
         .with(AddData::new(mock_handler));
 
-    Ok(Server::new(TcpListener::bind("0.0.0.0:3033"))
+    Ok(Server::new(TcpListener::bind("0.0.0.0:3000"))
         .run(app)
         .await?)
 }
